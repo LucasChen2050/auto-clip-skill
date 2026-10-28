@@ -1,0 +1,87 @@
+{
+  "name": "模板2 · IP 名片",
+  "description": "开头显示主讲人姓名与头衔；大号白色字幕、黄色关键词。个人 IP、观点输出、活动现场",
+  "max_chars": 11,
+  "music": "huoli",
+  "grade": "eq=contrast=1.05:saturation=1.06",
+  "subtitle": {
+    "font": "NotoSansSC-Black.otf",
+    "size": 0.068,
+    "color": "#FFFFFF",
+    "highlight": "#FFD43B",
+    "stroke": 0.05,
+    "stroke_color": "#151515",
+    "shadow": true,
+    "box_opacity": 0,
+    "pad_x": 0.3,
+    "pad_y": 0.12,
+    "pos_y": 0.8,
+    "emph_scale": 1.1
+  },
+  "speaker_card": {
+    "y": 0.62,
+    "x": 0.07,
+    "name_size": 0.078,
+    "line_size": 0.042,
+    "name_bg": "#FFD43B",
+    "name_color": "#151515",
+    "line_bg": "#000000",
+    "line_bg_opacity": 0.6,
+    "line_color": "#FFFFFF"
+  },
+  "ip_tag": {
+    "pos": "top_left",
+    "y": 0.045,
+    "size": 0.028,
+    "color": "#FFFFFF",
+    "bg": "#000000",
+    "bg_opacity": 0.35
+  },
+  "bigword": {
+    "color": "#FFD43B",
+    "stroke": 0.09,
+    "stroke_color": "#151515",
+    "skew": 0,
+    "center_y": 0.68
+  },
+  "cover": {
+    "focus_y": 0.35,
+    "show_ip": false,
+    "gradients": [
+      {
+        "pos": "bottom",
+        "height": 0.5,
+        "color": "#000000",
+        "opacity": 0.6
+      }
+    ],
+    "title": {
+      "font": "NotoSansSC-Black.otf",
+      "size": 0.115,
+      "min_size": 0.075,
+      "color": "#FFFFFF",
+      "stroke": 0.06,
+      "stroke_color": "#151515",
+      "shadow": true,
+      "max_width": 0.9,
+      "max_lines": 2,
+      "center_y": 0.7
+    },
+    "subtitle": {
+      "font": "NotoSansSC-Black.otf",
+      "size": 0.07,
+      "min_size": 0.05,
+      "color": "#151515",
+      "stroke": 0,
+      "shadow": false,
+      "max_width": 0.86,
+      "max_lines": 1,
+      "center_y": 0.82,
+      "box": {
+        "color": "#FFD43B",
+        "opacity": 1,
+        "radius": 0.08
+      }
+    }
+  }
+}

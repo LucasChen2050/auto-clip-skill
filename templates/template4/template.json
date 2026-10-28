@@ -1,0 +1,90 @@
+{
+  "name": "模板4 · 商业观察",
+  "description": "顶部深蓝常驻标题+金色副标题，白字描边字幕金色关键词。商业财经、行业洞察类",
+  "max_chars": 13,
+  "grade": "eq=contrast=1.04:saturation=1.03",
+  "top_title": {
+    "enabled": true,
+    "center_y": 0.105,
+    "font": "NotoSansSC-Black.otf",
+    "size": 0.07,
+    "color": "#FFFFFF",
+    "highlight": "#F3C14B",
+    "line2_scale": 0.72,
+    "stroke": 0,
+    "shadow": false,
+    "box_color": "#0F2650",
+    "box_opacity": 0.88,
+    "box_radius": 0.16,
+    "max_width": 0.86
+  },
+  "subtitle": {
+    "font": "NotoSansSC-Bold.otf",
+    "size": 0.05,
+    "color": "#FFFFFF",
+    "highlight": "#F3C14B",
+    "stroke": 0.09,
+    "stroke_color": "#0B1630",
+    "shadow": true,
+    "box_opacity": 0,
+    "pad_x": 0.3,
+    "pad_y": 0.12,
+    "pos_y": 0.8
+  },
+  "ip_tag": {
+    "pos": "top_left",
+    "y": 0.035,
+    "size": 0.028,
+    "color": "#FFFFFF",
+    "bg": "#0F2650",
+    "bg_opacity": 0.7
+  },
+  "cover": {
+    "gradients": [
+      {
+        "pos": "bottom",
+        "height": 0.45,
+        "color": "#06122B",
+        "opacity": 0.85
+      }
+    ],
+    "focus_y": 0.35,
+    "show_ip": true,
+    "title": {
+      "font": "NotoSansSC-Black.otf",
+      "size": 0.1,
+      "min_size": 0.07,
+      "color": "#FFFFFF",
+      "stroke": 0,
+      "shadow": true,
+      "max_width": 0.9,
+      "max_lines": 2,
+      "center_y": 0.72,
+      "box": null
+    },
+    "subtitle": {
+      "font": "NotoSansSC-Black.otf",
+      "size": 0.066,
+      "min_size": 0.05,
+      "color": "#0F2650",
+      "stroke": 0,
+      "shadow": false,
+      "max_width": 0.86,
+      "max_lines": 1,
+      "center_y": 0.84,
+      "box": {
+        "color": "#F3C14B",
+        "opacity": 1,
+        "radius": 0.1
+      }
+    }
+  },
+  "music": "fenghui",
+  "bigword": {
+    "color": "#F3C14B",
+    "stroke": 0.1,
+    "stroke_color": "#0B1630",
+    "skew": 0,
+    "center_y": 0.68
+  }
+}

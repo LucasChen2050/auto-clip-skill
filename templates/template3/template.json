@@ -1,0 +1,87 @@
+{
+  "name": "模板3 · 中英双语",
+  "description": "白色细字幕、黄色粗体关键词，下方配英文翻译（需接入 AI）。高级感、知识分享、对外展示",
+  "max_chars": 12,
+  "music": "qingkuai",
+  "grade": "eq=contrast=1.03:saturation=0.97",
+  "subtitle": {
+    "font": "NotoSansSC-Medium.otf",
+    "size": 0.064,
+    "color": "#FFFFFF",
+    "highlight": "#FFD43B",
+    "emph_font": "NotoSansSC-Black.otf",
+    "emph_scale": 1.12,
+    "stroke": 0,
+    "shadow": true,
+    "box_opacity": 0,
+    "pad_x": 0.3,
+    "pad_y": 0.1,
+    "pos_y": 0.775,
+    "bilingual": true,
+    "en_font": "NotoSansSC-Medium.otf",
+    "en_size": 0.036,
+    "en_color": "#FFFFFF"
+  },
+  "speaker_card": {
+    "y": 0.62,
+    "x": 0.07,
+    "name_size": 0.066,
+    "line_size": 0.038,
+    "name_bg": "#FFFFFF",
+    "name_color": "#151515",
+    "line_bg": "#000000",
+    "line_bg_opacity": 0.45,
+    "line_color": "#FFFFFF"
+  },
+  "ip_tag": {
+    "pos": "top_left",
+    "y": 0.045,
+    "size": 0.026,
+    "color": "#FFFFFF",
+    "bg_opacity": 0,
+    "opacity": 0.85
+  },
+  "bigword": {
+    "font": "NotoSansSC-Black.otf",
+    "color": "#FFD43B",
+    "stroke": 0,
+    "shadow": true,
+    "skew": 0,
+    "size": 0.1,
+    "center_y": 0.67
+  },
+  "cover": {
+    "focus_y": 0.35,
+    "show_ip": false,
+    "gradients": [
+      {
+        "pos": "bottom",
+        "height": 0.45,
+        "color": "#000000",
+        "opacity": 0.55
+      }
+    ],
+    "title": {
+      "font": "NotoSansSC-Black.otf",
+      "size": 0.1,
+      "min_size": 0.07,
+      "color": "#FFD43B",
+      "stroke": 0,
+      "shadow": true,
+      "max_width": 0.88,
+      "max_lines": 2,
+      "center_y": 0.72
+    },
+    "subtitle": {
+      "font": "NotoSansSC-Medium.otf",
+      "size": 0.055,
+      "min_size": 0.042,
+      "color": "#FFFFFF",
+      "stroke": 0,
+      "shadow": true,
+      "max_width": 0.86,
+      "max_lines": 1,
+      "center_y": 0.82
+    }
+  }
+}

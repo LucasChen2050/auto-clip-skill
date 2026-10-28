@@ -1,0 +1,86 @@
+{
+  "name": "模板1 · 口播简洁",
+  "description": "白字黑底字幕+黄色关键词；封面红字白边大标题+紫边斜体副标题。活动招募、通知类",
+  "aspect": "original",
+  "max_chars": 13,
+  "subtitle": {
+    "font": "NotoSansSC-Bold.otf",
+    "size": 0.052,
+    "color": "#FFFFFF",
+    "highlight": "#FFE14A",
+    "box_color": "#000000",
+    "box_opacity": 0.5,
+    "box_radius": 0.12,
+    "pad_x": 0.32,
+    "pad_y": 0.14,
+    "stroke": 0,
+    "shadow": false,
+    "keep_punct": false,
+    "pos_y": 0.86
+  },
+  "cover": {
+    "darken": 0,
+    "title": {
+      "font": "NotoSansSC-Black.otf",
+      "size": 0.112,
+      "color": "#EC2B24",
+      "stroke": 0.08,
+      "stroke_color": "#FFFFFF",
+      "shadow": true,
+      "skew": 0,
+      "max_width": 0.94,
+      "max_lines": 2,
+      "top": 0.085,
+      "min_size": 0.075
+    },
+    "subtitle": {
+      "font": "NotoSansSC-Black.otf",
+      "size": 0.1,
+      "color": "#FFFFFF",
+      "stroke": 0.07,
+      "stroke_color": "#3C2F8F",
+      "shadow": true,
+      "skew": 0.2,
+      "max_width": 0.9,
+      "max_lines": 2,
+      "center_y": 0.8,
+      "min_size": 0.07,
+      "extrude": {
+        "color": "#2A2170",
+        "depth": 0.05,
+        "dx": 0.5,
+        "dy": 1.0
+      }
+    }
+  },
+  "ip_tag": {
+    "pos": "top_left",
+    "y": 0.17,
+    "size": 0.03,
+    "color": "#FFFFFF",
+    "bg": "#000000",
+    "bg_opacity": 0.35
+  },
+  "top_title": {
+    "enabled": true,
+    "center_y": 0.095,
+    "font": "NotoSansSC-Black.otf",
+    "size": 0.088,
+    "color": "#EC2B24",
+    "highlight": "#3C2F8F",
+    "line2_scale": 0.72,
+    "stroke": 0.09,
+    "stroke_color": "#FFFFFF",
+    "shadow": true,
+    "box_opacity": 0,
+    "max_width": 0.92
+  },
+  "music": "huoli",
+  "bigword": {
+    "color": "#FFE14A",
+    "stroke": 0.1,
+    "stroke_color": "#1D1B19",
+    "skew": 0.12,
+    "center_y": 0.72
+  }
+}

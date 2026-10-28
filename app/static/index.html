@@ -1,0 +1,1048 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>全自动化剪辑 Skill @灵鋆智能</title>
+<style>
+:root{
+  --bg:#F5F3EF; --panel:#FFFFFF; --ink:#1D1B19; --ink2:#5E5A54; --ink3:#9A948B;
+  --line:#E7E2DA; --accent:#E5482D; --accent-soft:#FDECE7; --ok:#1F8A5B; --hl:#F2C21B;
+  --radius:14px; --shadow:0 1px 2px rgba(30,25,20,.05),0 6px 24px rgba(30,25,20,.06);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;font-size:14px;line-height:1.5}
+button{font:inherit;cursor:pointer}
+input,select{font:inherit;color:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+header{position:sticky;top:0;z-index:10;background:rgba(245,243,239,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:24px;height:64px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;letter-spacing:.5px;white-space:nowrap}
+.brandBy{font-weight:500;font-size:13px;color:var(--muted,#8a837b);margin-left:-2px}
+.logo i{width:28px;height:28px;border-radius:8px;background:var(--accent);display:grid;place-items:center;color:#fff;font-style:normal;font-size:15px}
+.badge{font-size:12px;color:var(--ok);background:#E6F4EC;padding:2px 8px;border-radius:99px;font-weight:500}
+.steps{display:flex;gap:4px;margin-left:auto;overflow-x:auto}
+.step{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:99px;color:var(--ink3);white-space:nowrap;font-size:13px}
+.step b{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11px;background:var(--line);color:var(--ink2)}
+.step.on{color:var(--ink);background:var(--panel);box-shadow:var(--shadow)}
+.step.on b{background:var(--accent);color:#fff}
+.step.done b{background:var(--ink);color:#fff}
+main.wrap{padding:28px 24px 80px}
+.mods{display:flex;gap:4px;background:#ECE8E1;border-radius:12px;padding:4px}
+.mods button{border:0;background:transparent;padding:7px 16px;border-radius:9px;color:var(--ink2);font-weight:600}
+.mods button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.subbar{border-top:1px solid var(--line)}
+.subbar .steps{margin:0;padding:8px 0;justify-content:flex-end}
+iframe.mod{display:block;width:100%;border:0;height:calc(100vh - 65px);background:var(--bg)}
+.card{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px}
+h2{font-size:22px;margin:0 0 4px}
+.sub{color:var(--ink2);margin:0 0 20px}
+.btn{border:0;border-radius:10px;padding:10px 18px;background:var(--ink);color:#fff;font-weight:600}
+.btn:hover{filter:brightness(1.15)}
+.btn.accent{background:var(--accent)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.ghost:hover{background:#FAF8F5}
+.btn.small{padding:6px 12px;font-size:13px;border-radius:8px}
+.btn:disabled{opacity:.4;cursor:not-allowed;filter:none}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.grid2{display:grid;grid-template-columns:380px 1fr;gap:24px;align-items:start}
+.hidden{display:none!important}
+.label{font-size:12px;color:var(--ink3);margin-bottom:6px;font-weight:600;letter-spacing:.3px}
+.seg{display:inline-flex;background:#F0EDE8;border-radius:10px;padding:3px}
+.seg button{border:0;background:transparent;padding:6px 14px;border-radius:8px;color:var(--ink2)}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08);font-weight:600}
+.progress{height:8px;background:#EEE9E2;border-radius:99px;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .3s}
+.notice{display:flex;gap:16px;align-items:center;background:#FFF8E6;border:1px solid #F3E2B3;border-radius:12px;padding:14px 18px;margin-bottom:20px}
+.notice.err{background:#FDECEC;border-color:#F3C3C3}
+/* 导入 */
+.drop{border:2px dashed #D9D2C7;border-radius:var(--radius);padding:48px 24px;text-align:center;cursor:pointer;transition:.2s;background:#FCFBF9}
+.drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop .big{font-size:18px;font-weight:600;margin:8px 0 4px}
+.tpls{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;max-height:620px;overflow:auto;padding:2px}
+.tpl{border:1.5px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;background:#fff;text-align:left}
+.tpl.on{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.tpl img{display:block;width:100%;border-radius:8px;margin-bottom:10px;background:#eee;aspect-ratio:612/534;object-fit:cover}
+.tpl .mock{height:120px;border-radius:8px;background:linear-gradient(160deg,#6d7a86,#2f3a44);position:relative;overflow:hidden;margin-bottom:10px}
+.tpl .mock .t{position:absolute;top:12px;left:0;right:0;text-align:center;font-weight:900;color:#EC2B24;font-size:18px;
+  text-shadow:-2px -2px 0 #fff,2px -2px 0 #fff,-2px 2px 0 #fff,2px 2px 0 #fff,0 2px 0 #fff,0 -2px 0 #fff,2px 0 0 #fff,-2px 0 0 #fff}
+.tpl .mock .s{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.5);color:#fff;font-size:11px;padding:2px 8px;border-radius:3px;white-space:nowrap}
+.tpl .mock .s em{font-style:normal;color:#FFE14A}
+.tpl b{display:block}
+.tpl small{color:var(--ink3)}
+.batch{display:grid;grid-template-columns:420px 1fr;gap:20px;align-items:start}
+.tpls.mini{grid-template-columns:repeat(3,1fr);max-height:none;gap:8px}
+.tpls.mini .tpl{padding:6px}
+.tpls.mini .tpl img{margin-bottom:6px}
+.tpls.mini .tpl b{font-size:12px}
+.tpls.mini .tpl small{display:none}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.sel{width:100%;border:1px solid var(--line);border-radius:9px;padding:7px 10px;background:#fff}
+.musicbox{background:#FAF8F5;border:1px solid var(--line);border-radius:12px;padding:12px}
+.musicbox.over{border-color:var(--accent);background:var(--accent-soft)}
+.checks{display:flex;flex-direction:column;gap:8px;margin:16px 0 4px}
+.checks label{display:flex;gap:8px;align-items:center;font-size:13px}
+.checks input{accent-color:var(--accent)}
+.up{display:flex;gap:10px;align-items:center;font-size:12px;margin-top:10px;color:var(--ink2)}
+.up .progress{flex:1}
+.qhead{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.qhead h2{margin:0}
+.empty{padding:60px 20px;text-align:center;color:var(--ink3)}
+.job{display:grid;grid-template-columns:64px 1fr auto;gap:14px;padding:14px 0;border-top:1px solid var(--line);align-items:start}
+.job img.th{width:64px;height:96px;object-fit:cover;border-radius:8px;background:#EEE}
+.job .nm{font-weight:600}
+.job .tt{color:var(--accent);font-size:13px;margin-left:6px}
+.chips2{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 6px}
+.chip{font-size:11.5px;padding:2px 9px;border-radius:99px;background:#F1EEE9;color:var(--ink3);white-space:nowrap}
+.chip.done{background:#E8F4EC;color:#1F6B47}
+.chip.skipped{background:#F5F0E3;color:#8A6D1E}
+.chip.running{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.chip.error{background:#FDECEC;color:#B3261E;font-weight:600}
+.jmsg{font-size:12px;color:var(--ink2);line-height:1.5}
+.jmsg.err{color:#B3261E;background:#FDF3F2;border-radius:8px;padding:6px 10px}
+.jact{display:flex;flex-direction:column;gap:6px;align-items:stretch;min-width:110px}
+.backbar{display:flex;align-items:center;gap:12px}
+.recent{margin-top:28px}
+.recent a{display:flex;justify-content:space-between;padding:10px 4px;border-bottom:1px solid var(--line);color:var(--ink);text-decoration:none}
+.recent a:hover{color:var(--accent)}
+/* 处理中 */
+.processing{max-width:560px;margin:40px auto;text-align:center}
+.processing img{width:180px;border-radius:12px;margin-bottom:20px;box-shadow:var(--shadow)}
+/* 校对 */
+.phone{background:#111;border-radius:22px;padding:10px;position:sticky;top:132px}
+.stage{position:relative;border-radius:14px;overflow:hidden;background:#000;margin:0 auto}
+.stage video{position:absolute;display:block;object-fit:cover}
+.stage img.ovl{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.capwrap{position:absolute;left:5%;right:5%;text-align:center;transform:translateY(-50%);pointer-events:none}
+.cap{display:inline;padding:.14em .32em;border-radius:.12em;white-space:normal;box-decoration-break:clone;-webkit-box-decoration-break:clone;
+  font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;font-weight:500;line-height:1.55;paint-order:stroke fill}
+.cap em{font-style:normal}
+.ctrl{display:flex;gap:8px;align-items:center;margin-top:10px;color:#ddd;font-size:12px}
+.ctrl button{background:#2a2a2a;color:#fff;border:0;border-radius:8px;padding:6px 10px}
+.ctrl .tm{margin-left:auto;font-variant-numeric:tabular-nums}
+.stats{display:flex;gap:28px;align-items:flex-end;margin-bottom:16px}
+.stats .n{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.stats .n small{font-size:14px;color:var(--ink3);font-weight:500}
+.stats .k{font-size:12px;color:var(--ink3)}
+.tools{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:8px}
+.tools input[type=text]{border:1px solid var(--line);border-radius:8px;padding:6px 10px;width:110px;background:#fff}
+.hint{font-size:12px;color:var(--ink3);margin:10px 0}
+.hint code{background:#FFF4CC;padding:0 4px;border-radius:4px;color:#7a5b00}
+.lines{max-height:calc(100vh - 330px);overflow:auto;margin:0 -8px;padding:0 8px}
+.ln{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding:6px 8px;border-radius:10px;cursor:pointer}
+.ln:hover{background:#FAF8F5}
+.ln.cur{background:var(--accent-soft)}
+.ln .tm{font-size:12px;color:var(--ink3);font-variant-numeric:tabular-nums}
+.ln .txt{position:relative}
+.ln input{width:100%;border:1px solid transparent;background:transparent;border-radius:8px;padding:7px 10px;font-size:15px}
+.ln input:focus{outline:0;border-color:var(--line);background:#fff}
+.ln .render{position:absolute;inset:0;padding:8px 11px;font-size:15px;pointer-events:none;white-space:nowrap;overflow:hidden}
+.ln .render em{font-style:normal;background:#FFF0B3;color:#6b4e00;border-radius:3px;padding:0 1px}
+.ln input:not(:focus){color:transparent;caret-color:var(--ink)}
+.ln input:focus + .render{display:none}
+.ln.del .render{color:var(--ink3);text-decoration:line-through}
+.ln.del .render em{background:#eee;color:var(--ink3)}
+.ln .ops{display:flex;gap:4px;align-items:center}
+.ln .ops button{border:0;background:transparent;color:var(--ink3);padding:4px 8px;border-radius:6px;font-size:12px}
+.ln .ops button:hover{background:#EFEBE5;color:var(--ink)}
+.tag{font-size:11px;background:#F1EEE9;color:var(--ink2);padding:1px 6px;border-radius:99px;white-space:nowrap}
+.toggles{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.toggles label{display:flex;gap:5px;align-items:center;font-size:13px;color:var(--ink2);cursor:pointer}
+.toggles input{accent-color:var(--accent)}
+.stage img.fx{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:none}
+.stage.fxon img.fx{display:block}
+.stage.fxon .capwrap,.stage.fxon img.ovl{display:none}
+.ainote{font-size:12px;margin:-6px 0 12px;padding:8px 12px;border-radius:9px;background:#F1EEE9;color:var(--ink2);display:flex;gap:10px;align-items:center}
+.ainote.ok{background:#E8F4EC;color:#1F6B47}
+.ainote button{margin-left:auto}
+.login{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:60;padding:16px}
+.lcard{background:#fff;border-radius:18px;box-shadow:var(--shadow);width:min(400px,100%);padding:28px}
+.lcard .field input{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:15px;background:#fff}
+.modal{position:fixed;inset:0;background:rgba(29,27,25,.35);display:flex;align-items:center;justify-content:center;z-index:50}
+.modal .box{background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.2);width:min(520px,92vw);padding:24px}
+.modal .field input,.modal .field select{width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:#fff}
+.namebox{display:flex;gap:8px;align-items:center;max-width:620px;margin:6px 0 18px}
+.namebox input{flex:1;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:15px;background:#fff}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:18px}
+/* 封面 */
+.covergrid{display:grid;grid-template-columns:1fr 380px;gap:28px;align-items:start}
+.coverbox{display:flex;justify-content:center;gap:16px;background:#E9E5DE;border-radius:var(--radius);padding:24px;min-height:520px;align-items:center}
+.coverbox img{max-height:640px;max-width:100%;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.18);background:#ccc}
+.field{margin-bottom:18px}
+.field input[type=text]{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:15px;background:#fff}
+.field input[type=range]{width:100%;accent-color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:-8px 0 18px}
+.chips button{border:1px solid var(--line);background:#fff;border-radius:99px;padding:3px 10px;font-size:12px;color:var(--ink2)}
+.chips button:hover{border-color:var(--accent);color:var(--accent)}
+.frames{display:flex;gap:4px;overflow-x:auto;padding-bottom:4px}
+/* 导出 */
+.result{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:start}
+.result video{width:300px;border-radius:12px;background:#000;display:block}
+.covers{display:flex;gap:10px;margin-top:12px}
+.covers img{height:150px;border-radius:8px;box-shadow:var(--shadow)}
+.files a{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;text-decoration:none;color:var(--ink);background:#fff}
+.files a:hover{border-color:var(--accent)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:10px;z-index:99;font-size:13px}
+@media (max-width:900px){.grid2,.covergrid,.result{grid-template-columns:1fr}.phone{position:static}}
+</style>
+</head>
+<body>
+<header><div class="wrap bar">
+  <div class="logo"><i class="brandI">剪</i><span class="brandT">全自动化剪辑 Skill</span><span class="brandBy"></span> <span class="badge">本地运行</span></div>
+  <nav class="mods" id="mods"><button data-m="script">口播脚本</button><button data-m="ip">IP 打造</button><button data-m="clip" class="on">智能剪辑</button></nav>
+  <span class="hint hidden" id="userChip" style="margin:0 0 0 auto;white-space:nowrap"></span>
+  <button class="btn small ghost" id="dictBtn" style="margin-left:auto">我的词典</button>
+  <button class="btn small ghost" id="aiBtn" style="margin-left:8px">AI 设置</button>
+  <button class="btn small ghost hidden" id="logoutBtn">退出</button>
+</div>
+<div class="subbar hidden" id="stepsBar"><div class="wrap backbar"><button class="btn small ghost" id="backList">← 返回队列</button><span class="hint" id="editName" style="margin:0"></span><nav class="steps" id="steps" style="margin-left:auto"></nav></div></div></header>
+
+<main class="wrap" id="mod-clip">
+  <div id="modelBox" class="notice hidden">
+    <div style="flex:1">
+      <b>首次使用需要下载语音识别模型</b>（约 230MB，只需下载一次，之后完全离线可用）
+      <div class="progress" style="margin-top:8px"><i id="mBar"></i></div>
+      <div class="hint" id="mMsg" style="margin:6px 0 0"></div>
+    </div>
+    <button class="btn accent" id="mBtn">开始下载</button>
+  </div>
+
+  <!-- 1 导入 -->
+  <section id="v-import">
+    <div class="batch">
+      <div>
+        <div class="card">
+          <div class="drop" id="drop">
+            <div style="font-size:30px">🎬</div>
+            <div class="big">拖入一条或多条口播视频</div>
+            <div class="hint" style="margin:4px 0 0">按下面的设置自动剪完：防抖 → 识别 → 剪掉重说和气口 → 提炼标题 → 封面 → 导出</div>
+            <input type="file" id="file" accept="video/*,.mov,.mp4,.m4v,.mkv" multiple hidden>
+          </div>
+          <div id="uploads"></div>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <div class="label">剪辑模板</div>
+          <div class="tpls mini" id="tpls"></div>
+          <div class="opts">
+            <div><div class="label">节奏</div><div class="seg" id="pace"><button data-v="fast">紧凑</button><button data-v="normal">标准</button><button data-v="slow">舒缓</button></div></div>
+            <div><div class="label">画面防抖</div><select id="bStab" class="sel" title="自动判断：固定机位（手机支架、三脚架）不防抖，手持晃动时才防抖"><option value="auto">自动判断（推荐）</option><option value="gentle">轻柔</option><option value="standard">标准</option><option value="strong">强力</option><option value="off">关闭</option></select></div>
+            <div><div class="label">画幅</div><select id="bAspect" class="sel"><option value="original">保持原比例</option><option value="9:16">竖屏 9:16</option><option value="3:4">3:4</option><option value="16:9">横屏 16:9</option></select></div>
+            <div><div class="label">账号名（画面角落，可留空）</div><input type="text" id="bIp" class="sel" maxlength="20" placeholder="@你的账号名"></div>
+          </div>
+          <div class="label" style="margin-top:18px">主讲人介绍（开头约 4 秒显示姓名和头衔）</div>
+          <div class="musicbox spkbox">
+            <label class="row" style="gap:8px;margin-bottom:8px"><input type="checkbox" id="bSpk">显示主讲人介绍卡</label>
+            <div class="row" style="gap:10px;align-items:flex-start;flex-wrap:wrap">
+              <input type="text" id="bSpkN" class="sel" maxlength="16" placeholder="姓名，如：张三" style="width:170px">
+              <textarea id="bSpkT" class="sel" rows="3" maxlength="90" placeholder="头衔，每行一个，最多 3 行&#10;如：某某品牌 创始人&#10;10 年外贸经验" style="flex:1;min-width:220px;resize:vertical;font:inherit"></textarea></div>
+            <div class="hint" style="margin:6px 0 0">不填姓名时用上面的账号名；姓名和头衔都不填就不显示。</div>
+          </div>
+          <div class="label musicui" style="margin-top:18px">背景音乐</div>
+          <div class="musicbox musicui">
+            <div class="row" style="gap:8px;flex-wrap:nowrap"><select id="bBgm" class="sel" style="flex:1"></select>
+              <button class="btn small ghost" id="bgmPlay" title="试听">▶ 试听</button>
+              <button class="btn small ghost" id="bgmUp" title="上传自己的音乐">＋ 我的音乐</button>
+              <input type="file" id="bgmFile" accept="audio/*,.mp3,.m4a,.wav,.aac,.flac" hidden></div>
+            <div class="hint" id="bgmDesc" style="margin:6px 0 0"></div>
+            <div class="row" style="gap:10px;margin-top:8px"><span class="hint" style="margin:0;white-space:nowrap">音乐音量</span>
+              <input type="range" id="bVol" min="0" max="100" step="5" style="flex:1;accent-color:var(--accent)"><span class="hint" id="bVolTxt" style="margin:0;width:34px"></span></div>
+            <div class="hint" style="margin:4px 0 0">说话时音乐会自动压低，停顿时恢复。也可以把音乐文件直接拖到这里。</div>
+          </div>
+          <div class="checks">
+            <label><input type="checkbox" id="bFx">文字动效：关键词加粗放大，字幕弹出</label>
+            <label><input type="checkbox" id="bBig">重点大字：数字、时间、活动名在画面中间弹出</label>
+            <label><input type="checkbox" id="bSfx">音效：大字出现时“叮 / 啵”，开场“唰”（默认关闭）</label>
+            <label><input type="checkbox" id="bTitle">视频顶部显示标题（自动从文稿提炼）</label>
+            <label><input type="checkbox" id="fillers">剪掉“嗯、呃”、重说和重复的话</label>
+            <label><input type="checkbox" id="bEnh">画质增强</label>
+            <label><input type="checkbox" id="bDen">人声降噪</label>
+            <label id="useAiRow"><input type="checkbox" id="useAi"><span id="useAiTxt">AI 审阅</span></label>
+          </div>
+          <div class="hint">设置会自动保存，对之后导入的视频生效。</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="qhead"><h2>处理队列</h2><span class="hint" id="qStat" style="margin:0"></span>
+          <button class="btn small ghost" id="openOut" style="margin-left:auto">打开输出文件夹</button></div>
+        <div id="jobs"><div class="empty">还没有视频。把口播视频拖到左边，就会自动开始剪辑。</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 处理中 -->
+  <section id="v-process" class="hidden">
+    <div class="card processing">
+      <img id="pThumb" alt="">
+      <h2 id="pTitle">AI 正在剪辑</h2>
+      <p class="sub" id="pMsg">识别语音、寻找停顿…</p>
+      <div class="progress"><i id="pBar"></i></div>
+      <p class="hint">一分钟的视频大约需要十几秒到半分钟，视电脑性能而定</p>
+    </div>
+  </section>
+
+  <!-- 3 校对 -->
+  <section id="v-review" class="hidden">
+    <div class="grid2">
+      <div class="phone">
+        <div class="stage" id="stage">
+          <video id="vid" playsinline preload="auto"></video>
+          <img class="ovl" id="ovlImg" alt="">
+          <div class="capwrap" id="capwrap"><span class="cap" id="cap"></span></div>
+          <img class="fx" id="fxImg" alt="">
+        </div>
+        <div class="ctrl">
+          <button id="playBtn">▶ 播放剪后效果</button>
+          <button id="fxBtn" title="查看和导出完全一致的成片画面（含模板版式、标题）">成片效果图</button>
+          <span class="tm" id="tm">00:00</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="stats">
+          <div><div class="k">原片</div><div class="n" id="sIn">0<small>秒</small></div></div>
+          <div><div class="k">成片</div><div class="n" id="sOut" style="color:var(--accent)">0<small>秒</small></div></div>
+          <div><div class="k">剪掉的片段</div><div class="n" id="sDel">0</div></div>
+          <div style="margin-left:auto"><button class="btn small ghost" id="reBtn" title="重新识别">重新识别</button></div>
+        </div>
+        <div class="ainote" id="aiNote"><span></span><button class="btn small ghost" id="aiRe">重新整理</button></div>
+        <div class="tools">
+          <div><div class="label">模板</div><select id="tplSel" class="seg" style="border:0;padding:8px 10px;max-width:170px"></select></div>
+          <div><div class="label">账号名（显示在画面角落，可留空）</div><input type="text" id="ipName" maxlength="20" placeholder="@你的账号名" style="width:150px"></div>
+          <div><div class="label">画面与声音</div><div class="toggles">
+            <label>画面防抖 <select id="optStab" style="border:1px solid var(--line);border-radius:7px;padding:3px 6px;background:#fff">
+              <option value="auto">自动判断（推荐）</option><option value="gentle">轻柔</option><option value="standard">标准</option><option value="strong">强力</option><option value="off">关闭</option></select></label>
+            <label><input type="checkbox" id="optEnh">画质增强</label>
+            <label><input type="checkbox" id="optDen">人声降噪</label></div></div>
+          <div><div class="label">主讲人介绍</div><div class="toggles" style="flex-direction:column;align-items:flex-start;gap:6px">
+            <label><input type="checkbox" id="optSpk">开头显示</label>
+            <input type="text" id="spkName" maxlength="16" placeholder="姓名" style="width:150px;border:1px solid var(--line);border-radius:7px;padding:4px 8px">
+            <textarea id="spkTitles" rows="2" maxlength="90" placeholder="头衔，每行一个" style="width:190px;border:1px solid var(--line);border-radius:7px;padding:4px 8px;font:inherit;resize:vertical"></textarea></div></div>
+          <div><div class="label" id="fxLabel">动效与音乐</div><div class="toggles">
+            <label><input type="checkbox" id="optFx">文字动效</label>
+            <label><input type="checkbox" id="optBig">重点大字</label>
+            <label><input type="checkbox" id="optSfx">音效</label>
+            <select id="optBgm" style="border:1px solid var(--line);border-radius:7px;padding:3px 6px;background:#fff;max-width:190px"></select></div></div>
+        </div>
+        <div class="tools" style="border-top:0;padding-top:0">
+          <div><div class="label">节奏</div><div class="seg" id="pace2"><button data-v="fast">紧凑</button><button data-v="normal">标准</button><button data-v="slow">舒缓</button></div></div>
+          <div><div class="label">画幅</div><select id="aspect" class="seg" style="border:0;padding:8px 10px">
+            <option value="original">保持原比例</option><option value="9:16">竖屏 9:16</option><option value="3:4">3:4</option><option value="16:9">横屏 16:9</option><option value="1:1">方形 1:1</option></select></div>
+          <div style="width:140px"><div class="label">字幕位置</div><input type="range" id="subpos" min="0.55" max="0.95" step="0.01" style="width:100%;accent-color:var(--accent)"></div>
+          <div><div class="label">全部替换（如人名、专有名词）</div>
+            <div class="row" style="gap:6px"><input type="text" id="fFind" placeholder="识别错的词"><span>→</span><input type="text" id="fRep" placeholder="正确的词"><button class="btn small ghost" id="fBtn">替换</button></div>
+            <label class="hint" style="display:flex;gap:4px;align-items:center;margin:6px 0 0"><input type="checkbox" id="fRem" checked>记住这个纠正（写进<a href="#" onclick="openDict();return false" style="color:var(--accent)">我的词典</a>），以后的视频自动替换</label></div>
+        </div>
+        <div class="hint">点句子可预览；直接改字。灰色划线的是自动剪掉的重说、卡顿和语气词，点「恢复」可找回。用 <code>[ ]</code> 包住的字显示为<b style="color:#C79A00">黄色高亮</b>——选中文字点「高亮」即可。删掉的句子不会出现在成片里。</div>
+        <div class="lines" id="lines"></div>
+        <div class="foot">
+          <span class="hint" id="saveHint"></span>
+          <button class="btn accent" id="toCover">下一步：做封面 →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 封面 -->
+  <section id="v-cover" class="hidden">
+    <div class="covergrid">
+      <div>
+        <div class="coverbox"><img id="cImg" alt="封面预览"></div>
+        <div class="row" style="justify-content:center;margin-top:12px"><div class="seg" id="cRatio"><button data-v="9:16" class="on">9:16 抖音/视频号</button><button data-v="3:4">3:4 小红书</button></div></div>
+      </div>
+      <div class="card">
+        <h2>封面</h2>
+        <p class="sub">导出时会同时生成 9:16 和 3:4 两个尺寸。</p>
+        <div class="field"><div class="label">主标题 <span class="hint" style="font-weight:400">（部分模板也会作为视频顶部常驻标题）</span></div><input type="text" id="cTitle" maxlength="24" placeholder="例如：外贸人必看"></div>
+        <div class="chips" id="chips"></div>
+        <div class="field"><div class="label">副标题</div><input type="text" id="cSub" maxlength="24" placeholder="例如：欢迎各位积极参与"></div>
+        <div class="field"><div class="label">封面画面 <span id="cTime" style="float:right;font-weight:400"></span></div><input type="range" id="cT" min="0" step="0.1"></div>
+        <div class="field"><div class="label">画面放大</div><input type="range" id="cZoom" min="1" max="1.6" step="0.02" value="1"></div>
+        <div class="foot"><button class="btn ghost" id="backReview">← 返回校对</button><button class="btn accent" id="toExport">下一步：导出 →</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 导出 -->
+  <section id="v-export" class="hidden">
+    <div class="card" id="exReady">
+      <h2>一键导出</h2>
+      <p class="sub" id="exSum"></p>
+      <div class="label">文件名（日期 + 内容概括，可修改）</div>
+      <div class="namebox"><input type="text" id="exName" maxlength="40"><button class="btn small ghost" id="exNameReset">重新生成</button></div>
+      <div id="exRun" class="hidden" style="max-width:520px;margin:10px 0 18px">
+        <div class="progress"><i id="eBar"></i></div><div class="hint" id="eMsg"></div>
+      </div>
+      <div class="row"><button class="btn ghost" id="backCover">← 返回封面</button><button class="btn accent" id="exBtn">导出成片 + 封面</button></div>
+    </div>
+    <div class="card hidden" id="exDone">
+      <div class="result">
+        <div><video id="outVid" controls playsinline></video><div class="covers" id="covers"></div></div>
+        <div>
+          <h2>剪好了 🎉</h2>
+          <p class="sub" id="doneSum"></p>
+          <div class="files" id="files"></div>
+          <div class="row" style="margin-top:16px">
+            <button class="btn" id="openDir">打开所在文件夹</button>
+            <button class="btn ghost" id="again">再改改</button>
+            <button class="btn ghost" id="newOne">返回队列</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<iframe class="mod hidden" id="mod-script" title="口播脚本"></iframe>
+<iframe class="mod hidden" id="mod-ip" title="IP 打造"></iframe>
+
+<div class="login hidden" id="loginBox"><div class="lcard">
+  <div class="logo" style="justify-content:center;margin-bottom:6px"><i class="brandI">剪</i><span class="brandT">全自动化剪辑 Skill</span></div>
+  <p class="sub" style="text-align:center">在线版 · 批量口播剪辑，导入视频自动出片</p>
+  <div class="seg" id="lTab" style="display:flex;margin-bottom:18px"><button data-v="login" class="on" style="flex:1">登录</button><button data-v="reg" style="flex:1">注册</button></div>
+  <div class="field"><div class="label">账号</div><input id="lUser" placeholder="手机号或姓名" autocomplete="username"></div>
+  <div class="field"><div class="label">密码</div><input id="lPw" type="password" placeholder="至少 6 位" autocomplete="current-password"></div>
+  <div class="field reg-only hidden"><div class="label">称呼（选填）</div><input id="lName" placeholder="例如：张三 / 杭州区域"></div>
+  <div class="field reg-only hidden" id="lInvRow"><div class="label">邀请码</div><input id="lInv" placeholder="活动现场提供"></div>
+  <div class="hint" id="lMsg" style="min-height:18px;color:#B3261E"></div>
+  <button class="btn accent" id="lGo" style="width:100%;margin-top:6px">登录</button>
+  <p class="hint" style="text-align:center;margin-top:16px">视频只用于剪辑，成片保存 <span id="lKeep">7</span> 天后自动删除，请及时下载。</p>
+</div></div>
+
+<div class="modal hidden" id="dictModal"><div class="box" style="max-width:620px">
+  <h2>我的词典</h2>
+  <p class="sub">把你常说的专有名词、品牌、产品名、人名写在这里，每行一个（如 Claude Code、智能体、DeepSeek）。识别完会自动把发音相近的错字改成这里的写法；接入 AI 后，AI 还会参考词典再校对一遍，像“克劳德”这种写法完全不同的也能改对。<br>也可以写“识别错的词=正确的词”强制替换。以 # 开头的行是说明。</p>
+  <textarea id="dictText" spellcheck="false" style="width:100%;height:340px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;resize:vertical;background:#FCFBF9"></textarea>
+  <div class="hint" id="dictMsg" style="min-height:18px"></div>
+  <div class="foot" style="margin-top:6px"><button class="btn ghost" id="dictClose">关闭</button>
+    <button class="btn accent" id="dictSave">保存</button></div>
+  <p class="hint" style="margin-top:10px">对之后剪的视频生效；已经剪好的视频，在“查看 / 修改”里点“重新整理”即可按新词典再纠正一遍。</p>
+</div></div>
+
+<div class="modal hidden" id="aiModal"><div class="box">
+  <h2>AI 设置</h2>
+  <p class="sub">接入大模型后，剪辑时由 AI 判断哪些是说错重说的片段、纠正同音错别字，比本地规则更懂语义。只发送识别出的文字，不上传视频和声音；按服务商的标准计费，口播文字量很小。</p>
+  <div class="field"><div class="label">服务商</div><select id="aiPreset"></select></div>
+  <div class="field"><div class="label">接口地址</div><input id="aiUrl" placeholder="https://.../v1"></div>
+  <div class="field"><div class="label">模型名称</div><input id="aiModel"></div>
+  <div class="field"><div class="label">API Key <span class="hint" id="aiKeyHint" style="font-weight:400"></span></div><input id="aiKey" type="password" placeholder="sk-..."></div>
+  <label class="row" style="gap:8px;margin-bottom:16px"><input type="checkbox" id="aiOn" checked> 启用 AI 审阅和校对（会参考“我的词典”）</label>
+  <div class="hint" id="aiMsg" style="min-height:18px"></div>
+  <div class="foot" style="margin-top:8px"><button class="btn ghost" id="aiClose">关闭</button>
+    <div class="row"><button class="btn ghost" id="aiTest">测试连接</button><button class="btn accent" id="aiSave">保存</button></div></div>
+  <p class="hint" style="margin-top:14px">接口地址和模型名称以服务商文档为准；API Key 只保存在本机工具文件夹的 prefs.json 里。</p>
+</div></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const api = async (url, opt = {}) => {
+  const r = await fetch(url, opt);
+  if (r.status === 401 && S.cloud) { showLogin(); throw new Error('请先登录') }
+  if (!r.ok) { let m = r.statusText; try { m = (await r.json()).detail } catch (e) {} throw new Error(m) }
+  return r.headers.get('content-type')?.includes('json') ? r.json() : r;
+};
+const jpost = (url, body, method = 'POST') => api(url, {method, headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+const toast = (m) => { const t = document.createElement('div'); t.className = 'toast'; t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 2600) };
+const fmt = s => { s = Math.max(0, s); const m = Math.floor(s / 60); return `${String(m).padStart(2, '0')}:${(s % 60).toFixed(1).padStart(4, '0')}` };
+const esc = s => s.replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+const markup = t => esc(t).replace(/[\[【]([^\]】]*)[\]】]/g, '<em>$1</em>').replace(/[\[\]【】]/g, '');
+
+let S = {mod: 'clip', view: 0, status: null, file: null, tpl: null, pace: 'normal', P: null, cur: null, ratio: '9:16'};
+const STEPS = ['导入', '智能剪辑', '校对字幕', '封面', '导出'];
+const VIEWS = ['import', 'process', 'review', 'cover', 'export'];
+
+function show(i) {
+  VIEWS.forEach((v, k) => $('#v-' + v).classList.toggle('hidden', k !== i));
+  $('#steps').innerHTML = STEPS.map((s, k) => `<div class="step ${k === i ? 'on' : k < i ? 'done' : ''}"><b>${k < i ? '✓' : k + 1}</b>${s}</div>`).join('');
+  S.view = i; window.scrollTo(0, 0);
+  if (i !== 2) $('#vid').pause();
+  $('#stepsBar').classList.toggle('hidden', i === 0 || S.mod !== 'clip');
+  if (i === 0) { location.hash = ''; pollJobs() }
+}
+
+function seg(el, val, cb) {
+  el.querySelectorAll('button').forEach(b => {
+    b.classList.toggle('on', b.dataset.v === val);
+    b.onclick = () => { el.querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on'); cb(b.dataset.v) };
+  });
+}
+
+// ---------------- 模型
+async function loadStatus() {
+  S.status = await api('api/status');
+  const st = S.status;
+  $('#modelBox').classList.toggle('hidden', st.models_ready);
+  if (!st.models_ready) {
+    const d = st.download;
+    $('#mBar').style.width = (d.progress * 100) + '%';
+    $('#mMsg').textContent = d.error || d.message || '';
+    $('#modelBox').classList.toggle('err', !!d.error);
+    $('#mBtn').disabled = d.running;
+    $('#mBtn').textContent = d.error ? '重试' : d.running ? '下载中…' : '开始下载';
+    if (d.running) setTimeout(loadStatus, 800);
+  }
+  renderBatch();
+}
+// ---------------- 批量设置（自动保存，对之后导入的视频生效）
+function renderBatch() {
+  const st = S.status, b = st.batch;
+  $('#tpls').innerHTML = st.templates.map(t => `<button class="tpl ${t.id === b.template ? 'on' : ''}" data-id="${t.id}" title="${esc(t.description || '')}">
+    <img src="api/templates/${t.id}/preview.jpg" alt="" loading="lazy"><b>${esc(t.name.replace(/^模板\d+ · /, ''))}</b></button>`).join('');
+  document.querySelectorAll('#tpls .tpl').forEach(x => x.onclick = () => saveBatch({template: x.dataset.id}));
+  seg($('#pace'), b.pace, v => saveBatch({pace: v}));
+  $('#bStab').value = b.stabilize === true ? 'auto' : (b.stabilize === false ? 'off' : (b.stabilize || 'auto'));
+  $('#bAspect').value = b.aspect; $('#bIp').value = b.ip_name || '';
+  $('#bTitle').checked = b.top_title !== false; $('#fillers').checked = b.remove_fillers !== false;
+  $('#bFx').checked = b.text_fx !== false; $('#bBig').checked = b.bigwords !== false; $('#bSfx').checked = b.sfx === true;
+  $('#bVol').value = b.bgm_volume ?? 40; $('#bVolTxt').textContent = (b.bgm_volume ?? 40) + '%';
+  renderMusicSelect($('#bBgm'), b.bgm || 'auto', b.template);
+  $('#bEnh').checked = b.enhance !== false; $('#bDen').checked = b.denoise !== false;
+  $('#bSpk').checked = b.speaker_card !== false;
+  if (document.activeElement !== $('#bSpkN')) $('#bSpkN').value = b.speaker_name || '';
+  if (document.activeElement !== $('#bSpkT')) $('#bSpkT').value = b.speaker_titles || '';
+  const ok = st.ai_ready; $('#useAi').disabled = !ok; $('#useAi').checked = ok && b.use_ai !== false;
+  $('#useAiTxt').innerHTML = ok ? 'AI 审阅：判断重说、纠正错别字、提炼标题（只发送文字）'
+    : 'AI 审阅（未接入，<a href="#" onclick="openAI();return false" style="color:var(--accent)">去设置</a>；不接入也能用本地规则）';
+}
+async function saveBatch(ch) {
+  S.status.batch = await jpost('api/settings/batch', Object.assign({}, S.status.batch, ch), 'PUT');
+  renderBatch();
+}
+$('#bAspect').onchange = e => saveBatch({aspect: e.target.value});
+$('#bStab').onchange = e => saveBatch({stabilize: e.target.value});
+$('#bVol').oninput = e => { $('#bVolTxt').textContent = e.target.value + '%'; clearTimeout(S.volT); S.volT = setTimeout(() => saveBatch({bgm_volume: +e.target.value}), 300) };
+$('#bBgm').onchange = e => { stopBgm(); saveBatch({bgm: e.target.value}) };
+
+// ---------------- 背景音乐库
+function musicName(id) { const m = (S.status.music || []).find(x => x.id === id); return m ? m.name : '' }
+function renderMusicSelect(sel, val, tpl) {
+  const ms = S.status.music || [], rec = S.status.template_music?.[tpl];
+  const bi = ms.filter(m => m.kind === 'builtin'), us = ms.filter(m => m.kind === 'user');
+  sel.innerHTML = `<option value="auto">自动 · ${esc(musicName(rec) || '活力商务')}（模板推荐）</option><option value="none">不加音乐</option>`
+    + `<optgroup label="内置音乐（原创，可商用）">${bi.map(m => `<option value="${m.id}">${esc(m.name)} · ${m.bpm} BPM</option>`).join('')}</optgroup>`
+    + (us.length ? `<optgroup label="我的音乐">${us.map(m => `<option value="${esc(m.id)}">${esc(m.name)}</option>`).join('')}</optgroup>` : '');
+  sel.value = ms.some(m => m.id === val) || val === 'none' ? val : 'auto';
+  const cur = sel.value === 'auto' ? rec : sel.value, m = ms.find(x => x.id === cur);
+  const d = sel.id === 'bBgm' ? $('#bgmDesc') : null;
+  if (d) d.innerHTML = sel.value === 'none' ? '' : (m ? esc(m.desc || '') + (m.kind === 'user' ? ` <a href="#" id="bgmDel" style="color:var(--ink3)">删除这首</a>` : '') : '');
+  const del = $('#bgmDel'); if (del) del.onclick = async e => { e.preventDefault(); if (!confirm('从音乐库删除这首？')) return; await api('api/music/' + encodeURIComponent(m.id), {method: 'DELETE'}); await loadStatus(); saveBatch({bgm: 'auto'}) };
+}
+const bgmAudio = new Audio(); bgmAudio.volume = 0.6;
+function stopBgm() { bgmAudio.pause(); $('#bgmPlay').textContent = '▶ 试听' }
+$('#bgmPlay').onclick = () => {
+  if (!bgmAudio.paused) return stopBgm();
+  const v = $('#bBgm').value; const id = v === 'auto' ? S.status.template_music?.[S.status.batch.template] : v;
+  if (!id || id === 'none') return toast('当前设置为不加音乐');
+  const m = S.status.music.find(x => x.id === id);
+  bgmAudio.src = 'api/music/' + encodeURIComponent(id) + '/file'; bgmAudio.currentTime = 0;
+  bgmAudio.onloadedmetadata = () => { if (m && m.start) bgmAudio.currentTime = m.start };
+  bgmAudio.play().then(() => $('#bgmPlay').textContent = '■ 停止').catch(e => toast('无法播放：' + e.message));
+};
+bgmAudio.onended = stopBgm;
+async function uploadMusic(f) {
+  if (!f) return;
+  if (!/^audio\//.test(f.type) && !/\.(mp3|m4a|wav|aac|flac|ogg)$/i.test(f.name)) return toast('请选择音乐文件（mp3 / m4a / wav）');
+  toast('正在添加：' + f.name);
+  const fd = new FormData(); fd.append('file', f);
+  try {
+    const r = await fetch('api/music', {method: 'POST', body: fd}); const j = await r.json();
+    if (!r.ok) throw new Error(j.detail || '添加失败');
+    await loadStatus(); await saveBatch({bgm: j.id}); toast('已加入“我的音乐”，并设为当前背景音乐');
+  } catch (e) { toast(e.message) }
+}
+$('#bgmUp').onclick = () => $('#bgmFile').click();
+$('#bgmFile').onchange = e => { uploadMusic(e.target.files[0]); e.target.value = '' };
+const mbox = document.querySelector('.musicbox');
+mbox.ondragover = e => { e.preventDefault(); mbox.classList.add('over') };
+mbox.ondragleave = () => mbox.classList.remove('over');
+mbox.ondrop = e => { e.preventDefault(); e.stopPropagation(); mbox.classList.remove('over'); uploadMusic(e.dataTransfer.files[0]) };
+$('#bSpk').onchange = e => saveBatch({speaker_card: e.target.checked});
+$('#bSpkN').oninput = e => { clearTimeout(S.spkT); S.spkT = setTimeout(() => saveBatch({speaker_name: e.target.value.trim()}), 500) };
+$('#bSpkT').oninput = e => { clearTimeout(S.spkT2); S.spkT2 = setTimeout(() => saveBatch({speaker_titles: e.target.value}), 500) };
+$('#bIp').oninput = e => { clearTimeout(S.bipT); S.bipT = setTimeout(() => saveBatch({ip_name: e.target.value.trim()}), 500) };
+[['#bFx', 'text_fx'], ['#bBig', 'bigwords'], ['#bSfx', 'sfx'], ['#bTitle', 'top_title'], ['#fillers', 'remove_fillers'], ['#bEnh', 'enhance'], ['#bDen', 'denoise'], ['#useAi', 'use_ai']]
+  .forEach(([id, k]) => $(id).onchange = e => saveBatch({[k]: e.target.checked}));
+$('#mBtn').onclick = async () => { await api('api/models/download', {method: 'POST'}); setTimeout(loadStatus, 300) };
+
+// ---------------- 批量导入：每条视频上传后自动排队剪辑
+const drop = $('#drop');
+drop.onclick = () => $('#file').click();
+drop.ondragover = e => { e.preventDefault(); drop.classList.add('over') };
+drop.ondragleave = () => drop.classList.remove('over');
+drop.ondrop = e => {
+  e.preventDefault(); drop.classList.remove('over');
+  const fs = [...e.dataTransfer.files], au = fs.filter(f => /^audio\//.test(f.type) || /\.(mp3|m4a|wav|aac|flac)$/i.test(f.name));
+  if (au.length && au.length === fs.length) return uploadMusic(au[0]);
+  addFiles(fs);
+};
+$('#file').onchange = e => { addFiles([...e.target.files]); e.target.value = '' };
+S.upq = []; S.uploading = false;
+function addFiles(files) {
+  files = files.filter(f => /^video\//.test(f.type) || /\.(mp4|mov|m4v|mkv|avi|webm)$/i.test(f.name));
+  if (!files.length) return toast('请拖入视频文件');
+  if (!S.status.models_ready) return toast('请先下载语音识别模型（页面顶部）');
+  files.forEach(f => S.upq.push({f, pct: 0, id: Math.random().toString(36).slice(2)}));
+  renderUploads(); pumpUploads();
+}
+function renderUploads() {
+  $('#uploads').innerHTML = S.upq.map(u => `<div class="up"><span style="width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(u.f.name)}</span>
+    <div class="progress"><i style="width:${u.pct}%"></i></div><span>${u.err ? '失败' : u.pct < 100 ? Math.round(u.pct) + '%' : '已加入队列'}</span></div>`).join('');
+}
+async function pumpUploads() {
+  if (S.uploading) return; S.uploading = true;
+  while (true) {
+    const u = S.upq.find(x => x.pct < 100 && !x.err); if (!u) break;
+    try {
+      await new Promise((res, rej) => {
+        const fd = new FormData(); fd.append('file', u.f); fd.append('auto', '1');
+        const x = new XMLHttpRequest(); x.open('POST', 'api/projects');
+        x.upload.onprogress = e => { u.pct = Math.min(99, e.loaded / e.total * 100); renderUploads() };
+        x.onload = () => x.status < 300 ? res() : rej(new Error(JSON.parse(x.responseText).detail || '导入失败'));
+        x.onerror = () => rej(new Error('导入失败'));
+        x.send(fd);
+      });
+      u.pct = 100;
+    } catch (e) { u.err = true; toast(e.message) }
+    renderUploads(); pollJobs();
+  }
+  S.uploading = false;
+  setTimeout(() => { S.upq = S.upq.filter(u => u.pct < 100 || u.err); renderUploads() }, 3000);
+}
+
+// ---------------- 队列
+const STEP_LABEL = {stab: '防抖', asr: '识别', clean: '整理', title: '标题', cover: '封面', export: '导出'};
+const STEP_IDS = Object.keys(STEP_LABEL);
+function jobHTML(j) {
+  const st = j.steps, cur = j.current, err = STEP_IDS.find(k => st[k].status === 'error');
+  const chips = STEP_IDS.map(k => {
+    const x = st[k], s = x.status;
+    const pct = s === 'running' && x.progress ? ' ' + Math.round(x.progress * 100) + '%' : '';
+    const ic = s === 'done' ? '✓ ' : s === 'skipped' ? '– ' : s === 'error' ? '✗ ' : '';
+    return `<span class="chip ${s}" title="${esc(x.msg || '')}">${ic}${STEP_LABEL[k]}${pct}</span>`;
+  }).join('');
+  let msg = '';
+  if (err) msg = `<div class="jmsg err">${STEP_LABEL[err]}失败：${esc(st[err].msg || '')}</div>`;
+  else if (cur) msg = `<div class="jmsg">${esc(st[cur].msg || '处理中…')}</div>`;
+  else if (j.queue === 'queued') msg = `<div class="jmsg">排队中，前面的处理完会自动开始</div>`;
+  else if (j.export) msg = `<div class="jmsg">✓ ${esc(st.export.msg || '已导出')}${st.stab.status === 'skipped' && st.stab.msg && st.stab.msg.includes('失败') ? '　<span style="color:#8A6D1E">（防抖未生效）</span>' : ''}</div>`;
+  const canEdit = st.clean.status === 'done';
+  const act = [];
+  if (err) act.push(`<button class="btn small accent" data-a="retry" data-s="${err}">从「${STEP_LABEL[err]}」重试</button>`);
+  if (canEdit) act.push(`<button class="btn small ghost" data-a="edit">查看 / 修改</button>`);
+  if (j.export && !cur) act.push(S.cloud ? `<a class="btn small ghost" style="text-align:center;text-decoration:none" href="api/projects/${j.id}/download.zip" download>下载</a>`
+    : `<button class="btn small ghost" data-a="open">打开文件夹</button>`);
+  if (j.queue === 'queued') act.push(`<button class="btn small ghost" data-a="cancel">取消排队</button>`);
+  if (j.queue !== 'running' && j.queue !== 'queued') act.push(`<button class="btn small ghost" data-a="del" style="color:var(--ink3)">删除</button>`);
+  return `<div class="job" data-id="${j.id}"><img class="th" src="api/projects/${j.id}/file/thumb.jpg" alt="">
+    <div><div><span class="nm">${esc(j.name)}</span>${j.title ? `<span class="tt">「${esc(j.title)}」</span>` : ''}</div>
+    <div class="chips2">${chips}</div>${msg}</div><div class="jact">${act.join('')}</div></div>`;
+}
+async function pollJobs() {
+  clearTimeout(S.jobT);
+  if (S.view !== 0 || S.mod !== 'clip') { S.jobT = setTimeout(pollJobs, 2000); return }
+  let list = [];
+  try { list = await api('api/jobs') } catch (e) {}
+  const run = list.filter(j => j.queue === 'running').length, q = list.filter(j => j.queue === 'queued').length;
+  const done = list.filter(j => j.export && !j.current).length, bad = list.filter(j => j.queue === 'error').length;
+  $('#qStat').textContent = list.length ? `处理中 ${run} · 排队 ${q} · 已完成 ${done}${bad ? ' · 出错 ' + bad : ''}` : '';
+  $('#jobs').innerHTML = list.length ? list.map(jobHTML).join('') : '<div class="empty">还没有视频。把口播视频拖到左边，就会自动开始剪辑。</div>';
+  document.querySelectorAll('.job').forEach(row => row.querySelectorAll('button').forEach(b => b.onclick = () => jobAct(row.dataset.id, b.dataset.a, b.dataset.s)));
+  S.jobT = setTimeout(pollJobs, run || q ? 1500 : 4000);
+}
+async function jobAct(id, a, step) {
+  try {
+    if (a === 'retry') { await jpost(`api/projects/${id}/run`, {from_step: step}); toast('已重新排队') }
+    if (a === 'edit') return openProject(id);
+    if (a === 'open') await api(`api/projects/${id}/open_folder`, {method: 'POST'});
+    if (a === 'cancel') await api(`api/projects/${id}/cancel`, {method: 'POST'});
+    if (a === 'del') { if (!confirm('删除这条视频的剪辑记录？（已导出的成片文件不会删除）')) return; await api(`api/projects/${id}`, {method: 'DELETE'}) }
+  } catch (e) { toast(e.message) }
+  pollJobs();
+}
+$('#openOut').onclick = () => api('api/open_output', {method: 'POST'}).catch(e => toast(e.message));
+$('#backList').onclick = () => show(0);
+function loadRecent() { pollJobs() }
+
+// ---------------- 项目
+function stepInfo(P) {
+  const st = P.steps || {}, ids = STEP_IDS;
+  const cur = ids.find(k => (st[k] || {}).status === 'running');
+  const err = ids.find(k => (st[k] || {}).status === 'error');
+  const doneN = ids.filter(k => ['done', 'skipped'].includes((st[k] || {}).status)).length;
+  return {cur, err, prog: cur ? (st[cur].progress || 0) : 0, msg: cur ? st[cur].msg : (err ? st[err].msg : ''), doneN};
+}
+async function openProject(id) {
+  location.hash = id;
+  const P = await api(`api/projects/${id}`);
+  S.P = P; S.cur = null; S.nameEdited = false;
+  $('#editName').textContent = P.name + (P.cover?.title ? ' · ' + P.cover.title : '');
+  const cleanDone = (P.steps?.clean || {}).status === 'done';
+  if (!cleanDone) { show(1); pollProcess(); return }
+  show(2); setupReview();
+}
+async function pollProcess() {
+  const P = await api(`api/projects/${S.P.id}`); S.P = P;
+  const si = stepInfo(P);
+  $('#pThumb').src = `api/projects/${P.id}/file/thumb.jpg`;
+  $('#pBar').style.width = ((si.doneN + si.prog) / 6 * 100) + '%';
+  $('#pMsg').textContent = si.err ? '出错了：' + si.msg : (si.cur ? `${STEP_LABEL[si.cur]}：${si.msg || '…'}` : '排队中…');
+  if (si.err && (P.steps.clean || {}).status !== 'done') { toast('处理失败，可在队列里重试'); show(0); return }
+  if ((P.steps.clean || {}).status === 'done' && (!si.cur || ['title', 'cover', 'export'].includes(si.cur))) { show(2); setupReview(); return }
+  setTimeout(pollProcess, 800);
+}
+
+// ---------------- 校对
+let saveT = null;
+function stats() {
+  const P = S.P;
+  $('#sIn').innerHTML = P.info.duration.toFixed(1) + '<small>秒</small>';
+  $('#sOut').innerHTML = (P.out_duration ?? 0).toFixed(1) + '<small>秒</small>';
+  $('#sDel').textContent = P.lines.filter(l => l.deleted).length;
+}
+function hexA(h, a) { h = h.replace('#', ''); return `rgba(${parseInt(h.slice(0, 2), 16)},${parseInt(h.slice(2, 4), 16)},${parseInt(h.slice(4, 6), 16)},${a})` }
+function sizeStage() {
+  // 播放预览按所选模板排版：画面位置（上下色带）、常驻层、字幕样式都和成片一致
+  const P = S.P, g = P.geom || {W: P.info.width, H: P.info.height, region: [0, 0, P.info.width, P.info.height], focus: 0.4};
+  const maxW = 360, maxH = Math.min(640, window.innerHeight - 180);
+  let sw = maxW, sh = sw * g.H / g.W; if (sh > maxH) { sh = maxH; sw = sh * g.W / g.H }
+  const st = $('#stage'); st.style.width = sw + 'px'; st.style.height = sh + 'px';
+  const k = sw / g.W, [rx, ry, rw, rh] = g.region, v = $('#vid');
+  Object.assign(v.style, {left: rx * k + 'px', top: ry * k + 'px', width: rw * k + 'px', height: rh * k + 'px', objectPosition: `50% ${g.focus * 100}%`});
+  const ss = P.sub_style || {}, cap = $('#cap'), size = (ss.size || 0.052) * Math.min(g.W, g.H) * k;
+  const serif = /Serif/.test(ss.font || ''), black = /Black/.test(ss.font || '');
+  Object.assign(cap.style, {
+    fontSize: size + 'px', color: ss.color || '#fff',
+    fontFamily: serif ? '"Noto Serif SC","Songti SC","STSong",serif' : '"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif',
+    fontWeight: serif ? '700' : (black ? '900' : '500'),
+    background: ss.box_opacity > 0 ? hexA(ss.box_color || '#000000', ss.box_opacity) : 'transparent',
+    webkitTextStroke: ss.stroke > 0 ? `${ss.stroke * size * 1.6}px ${ss.stroke_color || '#000'}` : '0',
+    textShadow: ss.shadow ? `0 ${size * 0.06}px ${size * 0.12}px rgba(0,0,0,.6)` : 'none'});
+  S.hlCss = ss.highlight_style === 'box'
+    ? `background:${ss.highlight_bg};color:${ss.highlight_text};-webkit-text-stroke:0;padding:0 .12em;border-radius:.1em`
+    : `color:${ss.highlight || '#FFE14A'}` + (P.settings.text_fx !== false ? ';font-weight:900;font-size:1.18em' : '');
+  $('#capwrap').style.top = (P.settings.sub_pos * 100) + '%';
+}
+function refreshOverlay() { if (S.P) $('#ovlImg').src = `api/projects/${S.P.id}/overlay.png?_=${Date.now()}` }
+function setupReview() {
+  const P = S.P;
+  const v = $('#vid');
+  if (!v.src.endsWith(`api/projects/${P.id}/file/proxy.mp4`)) v.src = `api/projects/${P.id}/file/proxy.mp4`;
+  seg($('#pace2'), P.settings.pace, v => saveLines({pace: v}));
+  $('#aspect').value = P.settings.aspect || 'original';
+  $('#subpos').value = P.settings.sub_pos;
+  $('#tplSel').innerHTML = S.status.templates.map(t => `<option value="${t.id}">${esc(t.name)}</option>`).join('');
+  $('#tplSel').value = P.settings.template;
+  const sv = P.settings.stabilize; $('#optStab').value = sv === false || sv === 'off' ? 'off' : (['gentle', 'standard', 'strong'].includes(sv) ? sv : 'auto');
+  $('#optEnh').checked = P.settings.enhance !== false;
+  $('#optDen').checked = P.settings.denoise !== false;
+  $('#optFx').checked = P.settings.text_fx !== false; $('#optBig').checked = P.settings.bigwords !== false; $('#optSfx').checked = P.settings.sfx === true;
+  renderMusicSelect($('#optBgm'), P.settings.bgm || 'auto', P.settings.template);
+  $('#ipName').value = P.settings.ip_name || '';
+  $('#optSpk').checked = P.settings.speaker_card !== false;
+  $('#spkName').value = P.settings.speaker_name || ''; $('#spkTitles').value = P.settings.speaker_titles || '';
+  sizeStage(); stats(); renderLines(); refreshOverlay();
+  $('#saveHint').textContent = P.message || '';
+  const an = $('#aiNote'); an.className = 'ainote' + (/AI 已审阅/.test(P.ai_note || '') ? ' ok' : '');
+  an.querySelector('span').textContent = P.ai_note || (S.status.ai_ready ? '本条由本地规则整理。' : '本条由本地规则整理。想让 AI 判断重说和错别字，可在右上角「AI 设置」里接入大模型。');
+  if (S.cur == null) { const f = P.lines.find(l => !l.deleted); if (f) S.cur = f.id }
+  refreshFx();
+}
+// 成片效果图：暂停时显示和导出完全一致的画面（模板版式、常驻标题、字幕）
+S.fxPref = true;
+let fxT = null;
+function refreshFx() {
+  const st = $('#stage'); const on = S.fxPref && vid.paused && S.view === 2;
+  st.classList.toggle('fxon', on);
+  $('#fxBtn').textContent = S.fxPref ? '实时预览' : '成片效果图';
+  if (!on) return;
+  clearTimeout(fxT);
+  fxT = setTimeout(() => {
+    const t = vid.currentTime || 0;
+    $('#fxImg').src = `api/projects/${S.P.id}/preview?line=${S.cur || 0}&t=${t.toFixed(2)}&_=${Date.now()}`;
+  }, 150);
+}
+$('#fxBtn').onclick = () => { S.fxPref = !S.fxPref; refreshFx() };
+$('#tplSel').onchange = async e => { await saveLines({template: e.target.value}); $('#subpos').value = S.P.settings.sub_pos; renderMusicSelect($('#optBgm'), S.P.settings.bgm || 'auto', S.P.settings.template); refreshFx() };
+$('#optStab').onchange = e => saveLines({stabilize: e.target.value});
+$('#optEnh').onchange = e => saveLines({enhance: e.target.checked});
+$('#optDen').onchange = e => saveLines({denoise: e.target.checked});
+$('#optFx').onchange = e => saveLines({text_fx: e.target.checked});
+$('#optBig').onchange = e => saveLines({bigwords: e.target.checked});
+$('#optSfx').onchange = e => saveLines({sfx: e.target.checked});
+$('#optBgm').onchange = e => saveLines({bgm: e.target.value});
+$('#optSpk').onchange = e => saveLines({speaker_card: e.target.checked});
+$('#spkName').oninput = e => { clearTimeout(S.spT); S.spT = setTimeout(() => saveLines({speaker_name: e.target.value.trim()}), 500) };
+$('#spkTitles').oninput = e => { clearTimeout(S.spT2); S.spT2 = setTimeout(() => saveLines({speaker_titles: e.target.value}), 500) };
+$('#ipName').oninput = e => { clearTimeout(S.ipT); S.ipT = setTimeout(() => saveLines({ip_name: e.target.value.trim()}).then(refreshFx), 500) };
+function renderLines() {
+  const box = $('#lines');
+  box.innerHTML = S.P.lines.map(l => `
+    <div class="ln ${l.deleted ? 'del' : ''}" data-id="${l.id}">
+      <span class="tm">${fmt(l.start)}</span>
+      <div class="txt"><input value="${esc(l.text)}" spellcheck="false"><div class="render">${markup(l.text)}</div></div>
+      <div class="ops">${l.reason ? `<span class="tag">${l.reason}</span>` : ''}
+        <button data-a="hl" title="选中文字后点击">高亮</button>
+        <button data-a="del">${l.deleted ? '恢复' : '删除'}</button></div>
+    </div>`).join('');
+  box.querySelectorAll('.ln').forEach(row => {
+    const id = +row.dataset.id, l = S.P.lines.find(x => x.id === id), inp = row.querySelector('input');
+    row.onclick = e => { if (e.target.tagName !== 'BUTTON') playLine(l) };
+    inp.oninput = () => { l.text = inp.value; row.querySelector('.render').innerHTML = markup(l.text); queueSave() };
+    let sel = [0, 0];
+    inp.onselect = inp.onkeyup = inp.onmouseup = () => sel = [inp.selectionStart, inp.selectionEnd];
+    row.querySelector('[data-a=hl]').onmousedown = e => e.preventDefault();
+    row.querySelector('[data-a=hl]').onclick = () => {
+      let [a, b] = [inp.selectionStart, inp.selectionEnd];
+      if (a === b) [a, b] = sel;
+      if (a === b) { // 没选中：清除本句高亮
+        if (/[\[\]【】]/.test(l.text)) { l.text = l.text.replace(/[\[\]【】]/g, '') } else { toast('先在文字里选中要高亮的部分'); return }
+      } else {
+        const raw = l.text.replace(/[\[\]【】]/g, ''); const before = l.text.slice(0, a).replace(/[\[\]【】]/g, '').length;
+        const len = l.text.slice(a, b).replace(/[\[\]【】]/g, '').length;
+        l.text = raw.slice(0, before) + '[' + raw.slice(before, before + len) + ']' + raw.slice(before + len);
+      }
+      inp.value = l.text; row.querySelector('.render').innerHTML = markup(l.text); queueSave();
+    };
+    row.querySelector('[data-a=del]').onclick = () => { l.deleted = !l.deleted; renderLines(); queueSave(true) };
+  });
+}
+function queueSave(now) {
+  $('#saveHint').textContent = '保存中…';
+  clearTimeout(saveT); saveT = setTimeout(() => saveLines(), now ? 50 : 500);
+}
+async function saveLines(settings) {
+  const P = await jpost(`api/projects/${S.P.id}/lines`, {lines: S.P.lines.map(l => ({id: l.id, text: l.text, deleted: l.deleted})), settings}, 'PUT');
+  const keepFocus = document.activeElement;
+  S.P.out_duration = P.out_duration; S.P.intervals = P.intervals; S.P.settings = P.settings;
+  S.P.template_info = P.template_info; S.P.suggest_name = P.suggest_name; S.P.geom = P.geom; S.P.sub_style = P.sub_style;
+  if (settings) refreshOverlay();
+  if (settings && !('ip_name' in settings)) refreshFx();
+  stats(); sizeStage();
+  $('#saveHint').textContent = '已自动保存';
+  if (keepFocus) keepFocus.focus?.();
+}
+$('#aspect').onchange = e => saveLines({aspect: e.target.value});
+$('#subpos').oninput = e => { S.P.settings.sub_pos = +e.target.value; sizeStage(); clearTimeout(S.spT); S.spT = setTimeout(() => saveLines({sub_pos: +e.target.value}), 300) };
+$('#fBtn').onclick = async () => {
+  const find = $('#fFind').value.trim(); if (!find) return toast('先填要替换的词');
+  const r = await jpost(`api/projects/${S.P.id}/replace`, {find, replace: $('#fRep').value.trim(), remember: $('#fRem').checked});
+  S.P.lines = r.project.lines; renderLines(); stats(); toast(`已替换 ${r.count} 处`);
+};
+$('#reBtn').onclick = async () => {
+  if (!confirm('重新识别会覆盖你在校对页做的修改，确定吗？')) return;
+  await jpost(`api/projects/${S.P.id}/process`, {template: S.P.settings.template, pace: S.P.settings.pace, remove_fillers: S.P.settings.remove_fillers});
+  show(1); pollProcess();
+};
+
+// 播放：跳过被剪掉的部分，叠加字幕，模拟成片效果
+const vid = $('#vid'); let playEnd = null;
+function inIv(t) { return (S.P.intervals || []).find(([a, b]) => t >= a - 0.01 && t < b) }
+function nextIv(t) { return (S.P.intervals || []).find(([a]) => a > t) }
+function curLine(t) {
+  const L = S.P.lines.filter(l => !l.deleted && l.text.replace(/[\[\]【】]/g, '').trim());
+  for (let i = L.length - 1; i >= 0; i--) {
+    if (t >= L[i].start - 0.05) { const nx = L[i + 1]; const end = nx && nx.start - L[i].end < 0.6 ? nx.start : L[i].end; return t < end ? L[i] : null }
+  }
+  return null;
+}
+function tick() {
+  if (S.view === 2) {
+    const t = vid.currentTime;
+    if (!vid.paused) {
+      if (playEnd === null && !inIv(t)) { const n = nextIv(t); if (n) vid.currentTime = n[0]; else { vid.pause() } }
+      if (playEnd !== null && t >= playEnd) { vid.pause(); playEnd = null }
+    }
+    const l = curLine(vid.currentTime);
+    $('#cap').innerHTML = l ? markup(l.text).replace(/<em>/g, `<em style="${S.hlCss || ''}">`) : ''; $('#cap').style.visibility = l ? 'visible' : 'hidden';
+    if (l && S.cur !== l.id && !vid.paused) {
+      S.cur = l.id; document.querySelectorAll('.ln').forEach(r => r.classList.toggle('cur', +r.dataset.id === l.id));
+    }
+    $('#tm').textContent = fmt(vid.currentTime) + ' / ' + fmt(S.P.info.duration);
+  }
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+function playLine(l) {
+  // 点一句：播放这一句，播完停住并显示这一句的成片效果图
+  S.cur = l.id; document.querySelectorAll('.ln').forEach(r => r.classList.toggle('cur', +r.dataset.id === l.id));
+  vid.currentTime = Math.max(0, l.start - 0.05); playEnd = l.end; vid.play().catch(() => refreshFx());
+}
+vid.onplay = () => { $('#playBtn').textContent = '❚❚ 暂停'; refreshFx() };
+vid.onpause = () => { $('#playBtn').textContent = '▶ 播放剪后效果'; refreshFx() };
+$('#playBtn').onclick = () => { if (vid.paused) { playEnd = null; if (!inIv(vid.currentTime)) { const n = nextIv(vid.currentTime) || (S.P.intervals || [])[0]; if (n) vid.currentTime = n[0] } vid.play() } else vid.pause() };
+window.onresize = () => S.view === 2 && sizeStage();
+
+// ---------------- 封面
+let cvT = null;
+$('#toCover').onclick = () => { show(3); setupCover() };
+$('#backReview').onclick = () => { show(2); setupReview() };
+function setupCover() {
+  const c = S.P.cover || {};
+  // 用字幕里的高亮关键词和句子做标题建议
+  const sug = [];
+  S.P.lines.filter(l => !l.deleted).forEach(l => (l.text.match(/[\[【][^\]】]+[\]】]/g) || []).forEach(m => { m = m.slice(1, -1); if (m.length > 1 && !sug.includes(m)) sug.push(m) }));
+  $('#chips').innerHTML = sug.length ? '<span class="hint" style="margin:3px 4px 0 0">建议：</span>' + sug.slice(0, 8).map(x => `<button>${esc(x)}</button>`).join('') : '';
+  $('#chips').querySelectorAll('button').forEach(b => b.onclick = () => { $('#cTitle').value = b.textContent; coverPreview() });
+  $('#cTitle').value = c.title || sug[0] || ''; $('#cSub').value = c.subtitle || '';
+  $('#cT').max = Math.max(0.1, S.P.info.duration - 0.1); $('#cT').value = c.t ?? 1; $('#cZoom').value = c.zoom || 1;
+  seg($('#cRatio'), S.ratio, v => { S.ratio = v; coverPreview() });
+  coverPreview();
+}
+function coverPreview() {
+  $('#cTime').textContent = fmt(+$('#cT').value);
+  clearTimeout(cvT);
+  cvT = setTimeout(async () => {
+    const body = {t: +$('#cT').value, title: $('#cTitle').value, subtitle: $('#cSub').value, zoom: +$('#cZoom').value, ratio: S.ratio};
+    S.P.cover = body;
+    const r = await jpost(`api/projects/${S.P.id}/cover_preview`, body);
+    const b = await r.blob(); const u = URL.createObjectURL(b);
+    const img = $('#cImg'); const old = img.src; img.src = u; if (old.startsWith('blob:')) URL.revokeObjectURL(old);
+  }, 250);
+}
+['#cTitle', '#cSub', '#cT', '#cZoom'].forEach(s => $(s).oninput = coverPreview);
+
+// ---------------- 导出
+$('#toExport').onclick = async () => { await coverPreviewNow(); show(4); setupExport() };
+async function coverPreviewNow() { clearTimeout(cvT); const body = {t: +$('#cT').value, title: $('#cTitle').value, subtitle: $('#cSub').value, zoom: +$('#cZoom').value, ratio: S.ratio}; await jpost(`api/projects/${S.P.id}/cover_preview`, body) }
+$('#backCover').onclick = () => { show(3); setupCover() };
+function setupExport() {
+  const P = S.P;
+  $('#exDone').classList.add('hidden'); $('#exReady').classList.remove('hidden');
+  const kept = P.lines.filter(l => !l.deleted).length;
+  const asp = {original: '原比例', '9:16': '竖屏 9:16', '3:4': '3:4', '16:9': '横屏 16:9', '1:1': '方形'}[P.settings.aspect || 'original'];
+  $('#exSum').textContent = `成片约 ${(P.out_duration || 0).toFixed(1)} 秒，${kept} 句字幕，${asp}。会输出：成片视频、9:16 和 3:4 两个封面、字幕 srt，都以下面的文件名命名。`;
+  const busy = ['running', 'queued'].includes(P.queue?.state);
+  $('#exRun').classList.toggle('hidden', !busy); $('#exBtn').disabled = busy;
+  if (busy) pollExport();
+  if (!S.nameEdited || !$('#exName').value) $('#exName').value = P.suggest_name || '';
+}
+$('#exName').oninput = () => S.nameEdited = true;
+$('#exNameReset').onclick = async () => { const P = await api(`api/projects/${S.P.id}`); S.nameEdited = false; $('#exName').value = P.suggest_name || '' };
+$('#exBtn').onclick = async () => {
+  try { await jpost(`api/projects/${S.P.id}/export`, {name: $('#exName').value.trim()}); $('#exRun').classList.remove('hidden'); $('#exBtn').disabled = true; pollExport() }
+  catch (e) { toast(e.message) }
+};
+async function pollExport() {
+  const P = await api(`api/projects/${S.P.id}`); S.P = P;
+  const si = stepInfo(P), ex = (P.steps.export || {});
+  $('#eBar').style.width = ((si.cur === 'export' ? 0.1 + 0.9 * si.prog : (si.cur === 'cover' ? 0.05 : 0))) * 100 + '%';
+  $('#eMsg').textContent = si.cur ? `${STEP_LABEL[si.cur]}：${si.msg || '…'}` : (P.queue?.state === 'queued' ? '排队中，前面的视频处理完就开始' : '');
+  if (si.err) { toast(`${STEP_LABEL[si.err]}失败：${si.msg}`); setupExport(); return }
+  if (ex.status === 'done' && !si.cur && P.queue?.state !== 'queued') return showDone();
+  setTimeout(pollExport, 800);
+}
+function showDone() {
+  const P = S.P, e = P.export;
+  $('#exReady').classList.add('hidden'); $('#exDone').classList.remove('hidden');
+  $('#outVid').src = `api/projects/${P.id}/file/${encodeURIComponent(e.files[0])}?v=${Date.now()}`;
+  $('#doneSum').textContent = `成片 ${e.duration.toFixed(1)} 秒（原片 ${P.info.duration.toFixed(1)} 秒）。文件已保存在本机 output 文件夹。`;
+  $('#covers').innerHTML = e.files.filter(f => f.endsWith('.jpg')).map(f => `<img src="api/projects/${P.id}/file/${encodeURIComponent(f)}?v=${Date.now()}">`).join('');
+  const icon = {mp4: '🎬', jpg: '🖼', srt: '📝'};
+  $('#files').innerHTML = e.files.map(f => `<a href="api/projects/${P.id}/file/${encodeURIComponent(f)}?download=1"><span>${icon[f.split('.').pop()] || '📄'} ${f}</span><span class="hint" style="margin:0">下载</span></a>`).join('');
+}
+$('#openDir').onclick = () => api(`api/projects/${S.P.id}/open_folder`, {method: 'POST'}).catch(e => toast(e.message));
+$('#again').onclick = async () => { await jpost(`api/projects/${S.P.id}/lines`, {lines: []}, 'PUT'); S.P.stage = 'ready'; show(2); setupReview() };
+$('#newOne').onclick = () => { location.hash = ''; S.P = null; show(0); loadRecent() };
+
+// ---------------- 模块切换：智能剪辑 / 口播脚本 / IP 打造
+const MODS = {script: 'modules/script.html', ip: 'modules/ip.html'};
+function showMod(m) {
+  document.querySelectorAll('#mods button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
+  S.mod = m;
+  $('#mod-clip').classList.toggle('hidden', m !== 'clip'); $('#stepsBar').classList.toggle('hidden', m !== 'clip' || S.view === 0);
+  Object.keys(MODS).forEach(k => {
+    const f = $('#mod-' + k); f.classList.toggle('hidden', k !== m);
+    if (k === m && !f.src) f.src = MODS[k];
+  });
+  if (m !== 'clip') vid.pause();
+  try { localStorage.setItem('mod', m) } catch (e) {}
+}
+document.querySelectorAll('#mods button').forEach(b => b.onclick = () => showMod(b.dataset.m));
+
+// ---------------- AI 设置
+async function openAI() {
+  const c = await api('api/settings/ai'), presets = S.status.ai_presets;
+  $('#aiPreset').innerHTML = presets.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  $('#aiPreset').value = c.preset || 'deepseek';
+  const pr = presets.find(p => p.id === $('#aiPreset').value) || {};
+  $('#aiUrl').value = c.base_url || pr.base_url || ''; $('#aiModel').value = c.model || pr.model || '';
+  $('#aiKey').value = ''; $('#aiKeyHint').textContent = c.has_key ? `（已保存，尾号 ${c.key_tail}；留空表示不修改）` : '';
+  $('#aiOn').checked = c.enabled !== false; $('#aiMsg').textContent = c.global && !c.has_key ? '管理员已为所有人开通 AI 审阅，可以直接使用；如需用自己的 Key，在下面填写。' : '';
+  $('#aiModal').classList.remove('hidden');
+}
+$('#aiPreset').onchange = () => { const p = S.status.ai_presets.find(x => x.id === $('#aiPreset').value); if (p && p.base_url) { $('#aiUrl').value = p.base_url; $('#aiModel').value = p.model } };
+const aiBody = () => ({preset: $('#aiPreset').value, base_url: $('#aiUrl').value.trim(), model: $('#aiModel').value.trim(), api_key: $('#aiKey').value.trim(), enabled: $('#aiOn').checked});
+async function openDict() {
+  const d = await api('api/dictionary'); $('#dictText').value = d.text; $('#dictMsg').textContent = `共 ${d.terms} 个词、${d.pairs} 条强制替换`;
+  $('#dictModal').classList.remove('hidden');
+}
+$('#dictBtn').onclick = openDict; $('#dictClose').onclick = () => $('#dictModal').classList.add('hidden');
+$('#dictSave').onclick = async () => { const d = await jpost('api/dictionary', {text: $('#dictText').value}, 'PUT'); $('#dictModal').classList.add('hidden'); toast(`词典已保存：${d.terms} 个词、${d.pairs} 条替换`) };
+$('#aiBtn').onclick = openAI; $('#aiClose').onclick = () => $('#aiModal').classList.add('hidden');
+$('#aiTest').onclick = async () => { $('#aiMsg').textContent = '正在测试…'; try { await jpost('api/settings/ai/test', aiBody()); $('#aiMsg').textContent = '✓ 连接成功' } catch (e) { $('#aiMsg').textContent = '✗ ' + e.message } };
+$('#aiSave').onclick = async () => { await jpost('api/settings/ai', aiBody(), 'PUT'); await loadStatus(); $('#aiModal').classList.add('hidden'); toast(S.status.ai_ready ? 'AI 已启用，新剪的视频会先由 AI 审阅' : '已保存') };
+$('#aiRe').onclick = async () => {
+  const useAi = S.status.ai_ready;
+  if (!confirm(`用${useAi ? ' AI' : '本地规则'}重新整理剪辑点和字幕？你在校对页做的修改会被覆盖。`)) return;
+  await jpost(`api/projects/${S.P.id}/reclean`, {use_ai: useAi, remove_fillers: S.P.settings.remove_fillers !== false});
+  show(1); pollProcess();
+};
+
+// ---------------- 启动
+window.onhashchange = () => { const id = location.hash.slice(1); if (id && (!S.P || S.P.id !== id)) openProject(id) };
+// ---------------- 账号（在线版）
+S.lmode = 'login';
+function showLogin() {
+  $('#loginBox').classList.remove('hidden');
+  seg($('#lTab'), S.lmode, v => { S.lmode = v; showLogin() });
+  document.querySelectorAll('.reg-only').forEach(x => x.classList.toggle('hidden', S.lmode !== 'reg'));
+  $('#lInvRow').classList.toggle('hidden', S.lmode !== 'reg' || !S.auth?.invite);
+  $('#lGo').textContent = S.lmode === 'reg' ? '注册并进入' : '登录';
+  $('#lPw').autocomplete = S.lmode === 'reg' ? 'new-password' : 'current-password';
+}
+async function doAuth() {
+  $('#lMsg').textContent = '';
+  const body = {username: $('#lUser').value.trim(), password: $('#lPw').value, invite: $('#lInv').value.trim(), name: $('#lName').value.trim()};
+  if (!body.username || !body.password) return $('#lMsg').textContent = '请填写账号和密码';
+  try {
+    const r = await fetch(S.lmode === 'reg' ? 'api/auth/register' : 'api/auth/login', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+    const j = await r.json(); if (!r.ok) throw new Error(j.detail || '失败');
+    location.reload();
+  } catch (e) { $('#lMsg').textContent = e.message }
+}
+$('#lGo').onclick = doAuth;
+['#lUser', '#lPw', '#lInv'].forEach(x => $(x).onkeydown = e => { if (e.key === 'Enter') doAuth() });
+$('#logoutBtn').onclick = async () => { await fetch('api/auth/logout', {method: 'POST'}); location.reload() };
+function applyEdition(e) {
+  if (!e) return; S.edition = e;
+  document.title = e.brand + (e.by ? ' ' + e.by : '');
+  document.querySelectorAll('.brandT').forEach(x => x.textContent = e.brand);
+  document.querySelectorAll('.brandI').forEach(x => x.textContent = e.logo || '剪');
+  document.querySelectorAll('.brandBy').forEach(x => x.textContent = e.by || '');
+  if (!e.modules) { const m = $('#mods'); if (m) m.style.display = 'none' }
+  if (!e.music) {
+    document.querySelectorAll('.musicui').forEach(x => x.style.display = 'none');
+    $('#optBgm').style.display = 'none'; $('#fxLabel').textContent = '动效';
+  }
+}
+function applyCloud() {
+  if (!S.cloud) return;
+  document.querySelector('.badge').textContent = '在线版';
+  $('#userChip').classList.remove('hidden'); $('#userChip').textContent = S.auth.user.name;
+  $('#aiBtn').style.marginLeft = '8px'; $('#logoutBtn').classList.remove('hidden');
+  $('#openOut').textContent = '下载全部成片'; $('#openOut').onclick = () => { location.href = 'api/download_all.zip' };
+  $('#openDir').textContent = '下载（成片 + 封面 + 字幕）'; $('#openDir').onclick = () => { location.href = `api/projects/${S.P.id}/download.zip` };
+  const lim = S.status.limits; if (lim) $('#lKeep').textContent = lim.keep_days;
+  document.querySelectorAll('#aiModal .hint').forEach(h => { if (h.textContent.includes('prefs.json')) h.textContent = '接口地址和模型名称以服务商文档为准；API Key 保存在服务器上你自己的账号下，其他人看不到。' });
+  document.querySelector('#drop .hint').textContent = `支持批量上传。单个视频不超过 ${lim.upload_mb >= 1024 ? lim.upload_mb / 1024 + 'GB' : lim.upload_mb + 'MB'}、${lim.max_minutes} 分钟；成片保留 ${lim.keep_days} 天，请及时下载。`;
+}
+
+(async () => {
+  S.auth = await (await fetch('api/auth/me')).json(); S.cloud = S.auth.cloud; applyEdition(S.auth.edition);
+  if (S.cloud && !S.auth.user) { S.lmode = 'login'; showLogin(); return }
+  show(0); await loadStatus(); applyCloud(); loadRecent();
+
+  const id = location.hash.slice(1); if (id) openProject(id).catch(() => { location.hash = '' });
+})();
+</script>
+</body>
+</html>

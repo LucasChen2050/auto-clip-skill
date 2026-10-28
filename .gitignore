@@ -1,0 +1,19 @@
+# 运行时数据（视频、成片、个人设置、API Key）
+workspace/
+output/
+data/
+prefs.json
+corrections.txt
+models/
+music/
+# 打包
+build/
+dist/
+runtime/
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.DS_Store
+templates/*/preview.jpg.cover.jpg
