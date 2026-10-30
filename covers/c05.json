@@ -1,0 +1,53 @@
+{
+ "name": "撞色数字",
+ "desc": "白色大字里数字橙色突出，副标题绿色，干货、对比类",
+ "gradients": [
+  {
+   "pos": "bottom",
+   "height": 0.55,
+   "color": "#000000",
+   "opacity": 0.55
+  }
+ ],
+ "elements": [
+  {
+   "source": "ip",
+   "fallback": "name",
+   "font": "NotoSansSC-Bold.otf",
+   "size": 0.04,
+   "color": "#FFFFFF",
+   "stroke": 0,
+   "shadow": true,
+   "max_lines": 1,
+   "align": "right",
+   "x": 0.05,
+   "top": 0.04
+  },
+  {
+   "source": "title",
+   "font": "NotoSansSC-Black.otf",
+   "size": 0.15,
+   "min_size": 0.1,
+   "color": "#FFFFFF",
+   "highlight": "#FF7A00",
+   "stroke": 0,
+   "shadow": true,
+   "max_lines": 2,
+   "max_width": 0.92,
+   "center_y": 0.68,
+   "auto_hl": "numbers"
+  },
+  {
+   "source": "subtitle",
+   "font": "NotoSansSC-Black.otf",
+   "size": 0.09,
+   "min_size": 0.06,
+   "color": "#3FE08A",
+   "stroke": 0,
+   "shadow": true,
+   "max_lines": 1,
+   "max_width": 0.9,
+   "center_y": 0.84
+  }
+ ]
+}

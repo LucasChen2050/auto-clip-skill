@@ -7,6 +7,9 @@ import time
 import webbrowser
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
+# 只用工具自带的依赖：去掉电脑上其他 Python 装在用户目录里的包（版本不一致会导致启动失败）
+if os.path.isdir(os.path.join(ROOT, "runtime")):  # 安装包版本才这样做；从源码运行时不动
+    sys.path[:] = [p for p in sys.path if "site-packages" not in p or os.path.abspath(p).startswith(ROOT)]
 sys.path.insert(0, os.path.join(ROOT, "app"))
 
 

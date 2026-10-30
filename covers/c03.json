@@ -1,0 +1,47 @@
+{
+ "name": "账号牌·黄色重点",
+ "desc": "白底账号牌+大字标题，后半句黄色强调，口播观点类",
+ "gradients": [
+  {
+   "pos": "bottom",
+   "height": 0.45,
+   "color": "#000000",
+   "opacity": 0.45
+  }
+ ],
+ "elements": [
+  {
+   "source": "ip",
+   "fallback": "name",
+   "font": "NotoSansSC-Black.otf",
+   "size": 0.05,
+   "color": "#111111",
+   "stroke": 0,
+   "shadow": false,
+   "max_lines": 1,
+   "align": "left",
+   "x": 0.05,
+   "center_y": 0.66,
+   "box": {
+    "color": "#FFFFFF",
+    "opacity": 1,
+    "radius": 0
+   }
+  },
+  {
+   "source": "title",
+   "font": "NotoSansSC-Black.otf",
+   "size": 0.12,
+   "min_size": 0.085,
+   "color": "#FFFFFF",
+   "highlight": "#FFE14A",
+   "stroke": 0.09,
+   "stroke_color": "#111111",
+   "shadow": true,
+   "max_lines": 2,
+   "max_width": 0.94,
+   "center_y": 0.8,
+   "auto_hl": "tail"
+  }
+ ]
+}

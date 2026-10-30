@@ -1,0 +1,68 @@
+{
+ "name": "期数标签·宋体",
+ "desc": "右上角期数标签，背景空心大字，宋体标题，系列栏目类",
+ "darken": 0.12,
+ "gradients": [
+  {
+   "pos": "bottom",
+   "height": 0.5,
+   "color": "#000000",
+   "opacity": 0.5
+  }
+ ],
+ "elements": [
+  {
+   "type": "watermark",
+   "source": "title",
+   "font": "NotoSansSC-Medium.otf",
+   "size": 0.34,
+   "color": "#E8762B",
+   "opacity": 0.85,
+   "x": 0.06,
+   "top": 0.1,
+   "max_chars": 2
+  },
+  {
+   "source": "tag",
+   "font": "NotoSansSC-Black.otf",
+   "size": 0.06,
+   "color": "#FFFFFF",
+   "stroke": 0,
+   "shadow": false,
+   "max_lines": 1,
+   "align": "right",
+   "x": 0.0,
+   "top": 0.04,
+   "box": {
+    "color": "#E8622A",
+    "opacity": 1,
+    "radius": 0
+   }
+  },
+  {
+   "source": "title",
+   "font": "NotoSerifSC-Black.otf",
+   "size": 0.1,
+   "min_size": 0.07,
+   "color": "#FFFFFF",
+   "highlight": "#FF8A3D",
+   "stroke": 0,
+   "shadow": true,
+   "max_lines": 2,
+   "max_width": 0.9,
+   "center_y": 0.72
+  },
+  {
+   "source": "subtitle",
+   "font": "NotoSerifSC-Black.otf",
+   "size": 0.15,
+   "min_size": 0.1,
+   "color": "#FF7A1A",
+   "stroke": 0,
+   "shadow": true,
+   "max_lines": 1,
+   "max_width": 0.9,
+   "center_y": 0.85
+  }
+ ]
+}

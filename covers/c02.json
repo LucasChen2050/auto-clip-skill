@@ -1,0 +1,45 @@
+{
+ "name": "白字黑边·黄标签",
+ "desc": "粗黑描边白字，底部黄色话题标签，知识科普类",
+ "gradients": [
+  {
+   "pos": "bottom",
+   "height": 0.4,
+   "color": "#000000",
+   "opacity": 0.35
+  }
+ ],
+ "elements": [
+  {
+   "source": "title",
+   "font": "NotoSansSC-Black.otf",
+   "size": 0.13,
+   "min_size": 0.09,
+   "color": "#FFFFFF",
+   "stroke": 0.11,
+   "stroke_color": "#111111",
+   "shadow": false,
+   "max_lines": 2,
+   "max_width": 0.92,
+   "center_y": 0.68
+  },
+  {
+   "source": "tag",
+   "fallback": "subtitle",
+   "prefix": "#",
+   "font": "NotoSansSC-Black.otf",
+   "size": 0.065,
+   "color": "#111111",
+   "stroke": 0,
+   "shadow": false,
+   "max_lines": 1,
+   "max_width": 0.8,
+   "center_y": 0.86,
+   "box": {
+    "color": "#FFE600",
+    "opacity": 1,
+    "radius": 0
+   }
+  }
+ ]
+}

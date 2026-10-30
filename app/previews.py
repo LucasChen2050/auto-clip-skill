@@ -42,7 +42,7 @@ def make(tpl, force=False):
     W, H = 1080, 1920
     a = render.compose_frame(fr, tpl, W, H, fr.width, fr.height, DEMO["sub"], "", DEMO["title"], DEMO["subtitle"],
                              DEMO["ip"], sub_en=DEMO["en"],
-                             speaker=(DEMO["name"], DEMO["titles"]) if tpl.get("speaker_card") else None)
+                             speaker=(DEMO["name"], DEMO["titles"]))
     tmp = out + ".cover.jpg"
     render.render_cover(SAMPLE, DEMO["title"], DEMO["subtitle"], tpl, W, H, tmp, ip_name=DEMO["ip"])
     b = Image.open(tmp)
@@ -55,7 +55,29 @@ def make(tpl, force=False):
     return out
 
 
+COVER_DEMO = dict(title="3个获客新渠道", subtitle="外贸人一定要知道", tag="第一期", ip="@你的账号名", name="张老师",
+                  titles=["10年外贸老兵", "服务300+工厂", "国际站认证讲师"])
+
+
+def cover_preview_path(cid):
+    return os.path.join(render.COVER_DIR, cid + ".jpg")
+
+
+def make_cover(c, force=False):
+    out = cover_preview_path(c["id"])
+    if os.path.exists(out) and not force:
+        return out
+    sample_frame()
+    render.render_cover_style(SAMPLE, c, COVER_DEMO, 300, 400, out)
+    return out
+
+
 def ensure_all(force=False):
+    for c in render.list_cover_styles():
+        try:
+            make_cover(c, force)
+        except Exception as e:  # noqa: BLE001
+            print("封面风格预览生成失败：", c["id"], e)
     for t in render.list_templates():
         try:
             make(t, force)

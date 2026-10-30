@@ -1,0 +1,44 @@
+{
+ "name": "黄色巨字·深色条",
+ "desc": "黄色巨字+深色通栏副标题，地产、活动、产品类",
+ "gradients": [
+  {
+   "pos": "bottom",
+   "height": 0.55,
+   "color": "#000000",
+   "opacity": 0.4
+  }
+ ],
+ "elements": [
+  {
+   "source": "title",
+   "font": "NotoSansSC-Black.otf",
+   "size": 0.16,
+   "min_size": 0.1,
+   "color": "#FFE600",
+   "stroke": 0.09,
+   "stroke_color": "#111111",
+   "shadow": true,
+   "max_lines": 2,
+   "max_width": 0.92,
+   "center_y": 0.62
+  },
+  {
+   "source": "subtitle",
+   "font": "NotoSansSC-Bold.otf",
+   "size": 0.062,
+   "min_size": 0.045,
+   "color": "#FFFFFF",
+   "stroke": 0,
+   "shadow": false,
+   "max_lines": 2,
+   "max_width": 0.86,
+   "center_y": 0.77,
+   "band": {
+    "color": "#000000",
+    "opacity": 0.55,
+    "scale": 1.0
+   }
+  }
+ ]
+}

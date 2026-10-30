@@ -28,7 +28,7 @@ build() {  # $1 平台目录  $2 包名  $3 类型(mac/win/linux)
   local D="$OUT/stage_$NAME/$DIR"
   rm -f "$OUT/$NAME.zip"
   mkdir -p "$D"
-  cp -r "$SRC/app" "$SRC/fonts" "$SRC/templates" "$SRC/vendor" "$SRC/sfx" "$SRC/run.py" "$D/"
+  cp -r "$SRC/app" "$SRC/fonts" "$SRC/templates" "$SRC/covers" "$SRC/vendor" "$SRC/sfx" "$SRC/run.py" "$D/"
   rm -f "$D"/templates/*/preview.jpg.cover.jpg
   cp "$SRC/edition.json" "$SRC/使用说明.md" "$D/"
   mkdir -p "$D/music/user"

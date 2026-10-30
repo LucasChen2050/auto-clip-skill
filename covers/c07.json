@@ -1,0 +1,52 @@
+{
+ "name": "胶囊人设·粉色大字",
+ "desc": "左上绿色胶囊放人设亮点（取主讲人头衔），粉色斜体大字，个人故事类",
+ "gradients": [
+  {
+   "pos": "bottom",
+   "height": 0.45,
+   "color": "#000000",
+   "opacity": 0.3
+  }
+ ],
+ "elements": [
+  {
+   "type": "pills",
+   "x": 0.05,
+   "top": 0.07,
+   "size": 0.05,
+   "bg": "#B7F36B",
+   "color": "#111111",
+   "font": "NotoSansSC-Black.otf",
+   "max": 3
+  },
+  {
+   "source": "title",
+   "font": "NotoSansSC-Black.otf",
+   "size": 0.14,
+   "min_size": 0.09,
+   "color": "#FF5FA2",
+   "highlight": "#D7262E",
+   "stroke": 0.08,
+   "stroke_color": "#FFFFFF",
+   "shadow": true,
+   "skew": 0.12,
+   "max_lines": 2,
+   "max_width": 0.92,
+   "center_y": 0.76,
+   "auto_hl": "numbers"
+  },
+  {
+   "source": "subtitle",
+   "font": "NotoSansSC-Black.otf",
+   "size": 0.06,
+   "color": "#FFFFFF",
+   "stroke": 0.06,
+   "stroke_color": "#111111",
+   "shadow": true,
+   "max_lines": 1,
+   "max_width": 0.9,
+   "center_y": 0.9
+  }
+ ]
+}

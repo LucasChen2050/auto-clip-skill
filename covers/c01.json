@@ -1,0 +1,42 @@
+{
+ "name": "黑条大字",
+ "desc": "副标题+主标题叠在黑色底条上，Vlog、清单类",
+ "gradients": [],
+ "elements": [
+  {
+   "source": "subtitle",
+   "font": "NotoSansSC-Black.otf",
+   "size": 0.075,
+   "color": "#FFFFFF",
+   "stroke": 0,
+   "shadow": false,
+   "max_lines": 1,
+   "max_width": 0.8,
+   "center_y": 0.47,
+   "box": {
+    "per_line": true,
+    "color": "#000000",
+    "opacity": 0.72
+   }
+  },
+  {
+   "source": "title",
+   "font": "NotoSansSC-Black.otf",
+   "size": 0.12,
+   "min_size": 0.085,
+   "color": "#FFFFFF",
+   "highlight": "#FFE14A",
+   "stroke": 0,
+   "shadow": false,
+   "max_lines": 2,
+   "max_width": 0.9,
+   "center_y": 0.6,
+   "box": {
+    "per_line": true,
+    "color": "#000000",
+    "opacity": 0.72
+   },
+   "auto_hl": "numbers"
+  }
+ ]
+}

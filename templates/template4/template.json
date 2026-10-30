@@ -1,90 +1,114 @@
 {
-  "name": "模板4 · 商业观察",
-  "description": "顶部深蓝常驻标题+金色副标题，白字描边字幕金色关键词。商业财经、行业洞察类",
-  "max_chars": 13,
+  "name": "模板4 · 校长访谈",
+  "description": "顶部白色大标题，宋体粗字幕配红色关键词，开头半透明名片带红点头衔。机构校长、创始人、门店老板",
+  "max_chars": 12,
+  "music": "wennuan",
   "grade": "eq=contrast=1.04:saturation=1.03",
-  "top_title": {
-    "enabled": true,
-    "center_y": 0.105,
-    "font": "NotoSansSC-Black.otf",
-    "size": 0.07,
-    "color": "#FFFFFF",
-    "highlight": "#F3C14B",
-    "line2_scale": 0.72,
-    "stroke": 0,
-    "shadow": false,
-    "box_color": "#0F2650",
-    "box_opacity": 0.88,
-    "box_radius": 0.16,
-    "max_width": 0.86
-  },
   "subtitle": {
-    "font": "NotoSansSC-Bold.otf",
-    "size": 0.05,
+    "font": "NotoSerifSC-Black.otf",
+    "size": 0.066,
     "color": "#FFFFFF",
-    "highlight": "#F3C14B",
-    "stroke": 0.09,
-    "stroke_color": "#0B1630",
+    "highlight": "#E0262E",
+    "stroke": 0.06,
+    "stroke_color": "#1A1A1A",
     "shadow": true,
     "box_opacity": 0,
     "pad_x": 0.3,
     "pad_y": 0.12,
-    "pos_y": 0.8
+    "pos_y": 0.7,
+    "emph_scale": 1.06
+  },
+  "top_title": {
+    "enabled": true,
+    "center_y": 0.12,
+    "font": "NotoSansSC-Black.otf",
+    "size": 0.084,
+    "color": "#FFFFFF",
+    "stroke": 0.07,
+    "stroke_color": "#1A1A1A",
+    "shadow": true,
+    "line2_scale": 0.72,
+    "line2_font": "NotoSansSC-Medium.otf",
+    "line2_color": "#FFFFFF",
+    "line2_stroke": 0.05,
+    "box_opacity": 0,
+    "max_width": 0.94
+  },
+  "speaker_card": {
+    "mode": "panel",
+    "x": 0.04,
+    "y": 0.58,
+    "name_size": 0.062,
+    "line_size": 0.04,
+    "name_font": "NotoSerifSC-Black.otf",
+    "line_font": "NotoSerifSC-Bold.otf",
+    "name_color": "#FFFFFF",
+    "line_color": "#FFFFFF",
+    "bullet": "#E0262E",
+    "panel_bg": "#3A3A3A",
+    "panel_opacity": 0.55
   },
   "ip_tag": {
     "pos": "top_left",
-    "y": 0.035,
-    "size": 0.028,
+    "y": 0.21,
+    "size": 0.026,
     "color": "#FFFFFF",
-    "bg": "#0F2650",
-    "bg_opacity": 0.7
+    "bg": "#000000",
+    "bg_opacity": 0.3
+  },
+  "bigword": {
+    "font": "NotoSerifSC-Black.otf",
+    "color": "#FFFFFF",
+    "stroke": 0.08,
+    "stroke_color": "#E0262E",
+    "skew": 0,
+    "center_y": 0.6,
+    "size": 0.11
   },
   "cover": {
+    "focus_y": 0.35,
+    "show_ip": false,
     "gradients": [
       {
+        "pos": "top",
+        "height": 0.3,
+        "color": "#000000",
+        "opacity": 0.45
+      },
+      {
         "pos": "bottom",
-        "height": 0.45,
-        "color": "#06122B",
-        "opacity": 0.85
+        "height": 0.35,
+        "color": "#000000",
+        "opacity": 0.4
       }
     ],
-    "focus_y": 0.35,
-    "show_ip": true,
     "title": {
       "font": "NotoSansSC-Black.otf",
-      "size": 0.1,
-      "min_size": 0.07,
+      "size": 0.11,
+      "min_size": 0.075,
+      "color": "#FFFFFF",
+      "stroke": 0.07,
+      "stroke_color": "#1A1A1A",
+      "shadow": true,
+      "max_width": 0.92,
+      "max_lines": 2,
+      "top": 0.08
+    },
+    "subtitle": {
+      "font": "NotoSerifSC-Black.otf",
+      "size": 0.075,
+      "min_size": 0.055,
       "color": "#FFFFFF",
       "stroke": 0,
       "shadow": true,
-      "max_width": 0.9,
-      "max_lines": 2,
-      "center_y": 0.72,
-      "box": null
-    },
-    "subtitle": {
-      "font": "NotoSansSC-Black.otf",
-      "size": 0.066,
-      "min_size": 0.05,
-      "color": "#0F2650",
-      "stroke": 0,
-      "shadow": false,
       "max_width": 0.86,
       "max_lines": 1,
-      "center_y": 0.84,
+      "center_y": 0.8,
       "box": {
-        "color": "#F3C14B",
+        "color": "#E0262E",
         "opacity": 1,
-        "radius": 0.1
+        "radius": 0.06
       }
     }
-  },
-  "music": "fenghui",
-  "bigword": {
-    "color": "#F3C14B",
-    "stroke": 0.1,
-    "stroke_color": "#0B1630",
-    "skew": 0,
-    "center_y": 0.68
   }
 }

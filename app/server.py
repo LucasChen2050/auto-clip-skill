@@ -31,6 +31,8 @@ import effects  # noqa: E402
 import music  # noqa: E402
 import auth  # noqa: E402
 import ctx  # noqa: E402
+import covershot  # noqa: E402
+import padkit  # noqa: E402
 
 ROOT = engine.ROOT
 STATIC = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
@@ -46,7 +48,7 @@ LIMITS = {  # 云端版的使用限制（环境变量可调）
 def _edition():
     """版本信息：品牌名称和功能开关，可在根目录的 edition.json 里修改。"""
     e = {"id": "lingjun", "brand": "全自动化剪辑 Skill", "short": "全自动化剪辑", "by": "@灵鋆智能", "logo": "剪",
-         "modules": False, "music": False}
+         "modules": False, "music": False, "pad": True}
     try:
         with open(os.path.join(ROOT, "edition.json"), encoding="utf-8") as f:
             e.update(json.load(f))
@@ -65,7 +67,7 @@ app = FastAPI(title=EDITION["brand"])
 
 class AuthMiddleware:
     """云端版：从 Cookie 识别账号，设置当前用户；未登录访问接口返回 401。本地版不做任何限制。"""
-    OPEN = ("/api/auth/", "/api/templates/")
+    OPEN = ("/api/auth/", "/api/templates/", "/api/covers/")
 
     def __init__(self, app_):
         self.app = app_
@@ -101,7 +103,8 @@ DEFAULT_SETTINGS = {"template": "template1", "pace": "normal", "remove_fillers":
                     "aspect": "original", "loudnorm": True, "stabilize": "auto", "enhance": True, "denoise": True,
                     "ip_name": "", "top_title": True,
                     "text_fx": True, "bigwords": True, "sfx": False, "bgm": "auto" if EDITION["music"] else "none",
-                    "bgm_volume": 40, "speaker_card": True, "speaker_name": "", "speaker_titles": ""}
+                    "bgm_volume": 40, "speaker_card": True, "speaker_name": "", "speaker_titles": "",
+                    "cover_style": "auto", "cover_tag": ""}
 
 
 def prefs():
@@ -206,7 +209,9 @@ def _safe(name):
 
 def suggest_name(p):
     """导出文件名：日期前缀 + 标题（标题由流水线从文稿提炼，也可以手动改）。"""
-    title = (p.get("cover") or {}).get("title", "").strip() or cleanup.summarize(p.get("lines", []))
+    cv = p.get("cover") or {}
+    title = ("" if cv.get("manual") else cv.get("file_title", "")).strip() or cv.get("title", "").strip() \
+        or cleanup.summarize(p.get("lines", []))
     title = re.sub(r"[\\/:*?\"<>|\s，。！？!?、,.；;：:“”\"'‘’（）()【】\[\]]+", "", title)[:24]
     return time.strftime("%y%m%d") + (title or _safe(p.get("name", "视频")))
 
@@ -346,14 +351,47 @@ def step_clean(pid, p):
 
 
 def step_title(pid, p):
-    cover = p.get("cover") or {}
-    if cover.get("manual"):
-        raise StepSkip("使用你填写的标题：" + cover.get("title", ""))
+    """封面包装：AI 给 5 个标题方案并挑出适合做封面的时刻；再按画面质量挑封面帧。"""
+    cover = dict(p.get("cover") or {})
     cfg = ai_cfg() if p["settings"].get("use_ai", True) else None
-    t, s, how = titles.extract(p["lines"], cfg)
-    cover.update(title=t, subtitle=s)
+    code_t, code_s = titles.extract_by_code(p["lines"])
+    pack, how, err = None, "", ""
+    if ai.ready(cfg):
+        set_step(pid, "title", msg="AI 正在想封面标题…")
+        try:
+            pack = titles.package_by_ai(p["lines"], cfg, code_t or "", code_s or "")
+        except Exception as e:  # noqa: BLE001
+            err = str(e)[:40]
+    if pack:
+        cover["options"] = pack["options"]
+        cover["moments"] = pack["moments"]
+        cover["file_title"] = code_t or pack["file_title"]
+    if not cover.get("manual"):
+        if pack:
+            o = pack["options"][pack["best"]]
+            cover.update(title=o["title"], subtitle=o["subtitle"])
+            how = f"AI 给了 {len(pack['options'])} 个标题方案，选用「{o['angle'] or '推荐'}」角度"
+        else:
+            t, s_, how = titles.extract(p["lines"], None)
+            cover.update(title=t, subtitle=s_)
+            if err:
+                how = f"AI 没成功（{err}），{how}"
+    else:
+        how = "使用你填写的标题"
+    # 选封面画面
+    if not cover.get("manual_t"):
+        set_step(pid, "title", msg="正在挑选封面画面…")
+        try:
+            src = work_src(p)
+            info = dict(media.probe(src), duration=p["info"]["duration"]) if src.endswith("stab.mp4") else p["info"]
+            cands = covershot.pick(src, info, p["lines"], cover.get("moments"), os.path.join(pdir(pid), "covers", "cands"))
+            if cands:
+                cover["cands"] = cands
+                cover["t"] = cands[0]["t"]
+        except Exception as e:  # noqa: BLE001
+            print("封面选帧失败：", e)
     update(pid, cover=cover)
-    return f"{how}：{t}" + (f" / {s}" if s else "")
+    return f"{how}：{cover.get('title', '')}" + (f" / {cover.get('subtitle')}" if cover.get("subtitle") else "")
 
 
 def _cover_size(p, ratio, scale=1.0):
@@ -378,6 +416,28 @@ def _ensure_stab(pid, p):
     return load(pid)
 
 
+def _speaker_values(s):
+    titles_ = [x.strip() for x in re.split(r"[\n|｜]", s.get("speaker_titles", "") or "") if x.strip()]
+    name_ = (s.get("speaker_name") or "").strip() or (s.get("ip_name") or "").strip().lstrip("@")
+    return name_, titles_
+
+
+def _render_cover(p, frame, title, subtitle, W, H, out, zoom, style=None, tag=None):
+    """按选择的封面风格出图；“跟随模板”时用视频模板自带的封面样式。"""
+    s = p["settings"]
+    cv = p.get("cover") or {}
+    style = style if style is not None else cv.get("style") or s.get("cover_style", "auto")
+    tag = tag if tag is not None else cv.get("tag", s.get("cover_tag", ""))
+    cs = render.get_cover_style(style) if style and style != "auto" else None
+    if cs:
+        name_, titles_ = _speaker_values(s)
+        vals = {"title": title, "subtitle": subtitle, "tag": tag, "ip": s.get("ip_name", ""), "name": name_,
+                "titles": titles_}
+        return render.render_cover_style(frame, cs, vals, W, H, out, zoom)
+    return render.render_cover(frame, title, subtitle, _tpl_for(p), W, H, out, zoom, s.get("ip_name", ""),
+                               (p["info"]["width"], p["info"]["height"]))
+
+
 def step_cover(pid, p):
     p = _ensure_stab(pid, p)
     d = pdir(pid)
@@ -388,9 +448,8 @@ def step_cover(pid, p):
     tpl = _tpl_for(p)
     for ratio, fname in (("9:16", "cover_9x16.jpg"), ("3:4", "cover_3x4.jpg")):
         W, H = _cover_size(p, ratio)
-        render.render_cover(frame, cv.get("title", ""), cv.get("subtitle", ""), tpl, W, H,
-                            os.path.join(d, "covers", fname), cv.get("zoom", 1.0), p["settings"].get("ip_name", ""),
-                            (p["info"]["width"], p["info"]["height"]))
+        _render_cover(p, frame, cv.get("title", ""), cv.get("subtitle", ""), W, H,
+                      os.path.join(d, "covers", fname), cv.get("zoom", 1.0))
     return "已生成 9:16 和 3:4 两个封面"
 
 
@@ -665,6 +724,7 @@ def status():
             "batch": batch_settings(), "steps": [{"id": s, "name": STEP_NAMES[s]} for s in STEPS],
             "ai_ready": ai.ready(ai_cfg()), "ai_presets": ai.PRESETS, "ai_global": bool(global_ai()),
             "cloud": CLOUD, "limits": LIMITS if CLOUD else None, "edition": EDITION,
+            "cover_styles": [{"id": c["id"], "name": c["name"], "desc": c.get("desc", "")} for c in render.list_cover_styles()],
             "music": [music.public(m) for m in music.all_music()],
             "template_music": {t["id"]: t.get("music", "huoli") for t in render.list_templates()}}
 
@@ -707,6 +767,95 @@ def put_batch(s: dict):
     cur["rev"] = SETTINGS_REV
     save_prefs(batch=cur, ip_name=str(cur.get("ip_name", ""))[:30])
     return cur
+
+
+# ---------------------------------------------------------------- 口播稿
+def _pad_info():
+    import lexicon
+    b = batch_settings()
+    name_, titles_ = _speaker_values(b)
+    return {"name": name_, "titles": "、".join(titles_), "terms": lexicon.parse()[0]}
+
+
+def _project_lines(n=30):
+    out = []
+    try:
+        names = sorted(os.listdir(ctx.ws()), key=lambda d: -os.path.getmtime(os.path.join(ctx.ws(), d)))[:n]
+    except OSError:
+        return out
+    for d in names:
+        f = os.path.join(ctx.ws(), d, "project.json")
+        try:
+            with open(f, encoding="utf-8") as fp:
+                pj = json.load(fp)
+        except Exception:  # noqa: BLE001
+            continue
+        src = "已剪视频「" + (pj.get("name") or "")[:8] + "」"
+        out += [(engine.plain(l["text"]), src) for l in pj.get("lines", []) if not l.get("deleted")]
+    return out
+
+
+def _pad_avoid(exclude_id=""):
+    ss = [s for s in padkit.load()["scripts"] if s["id"] != exclude_id][:15]
+    return "\n".join("- " + s["lines"][0] for s in ss if s["lines"])[:1200]
+
+
+@app.get("/api/pad")
+def pad_get():
+    return {"scripts": padkit.load()["scripts"], "templates": padkit.TEMPLATES, "types": padkit.TYPES}
+
+
+@app.put("/api/pad")
+def pad_put(script: dict):
+    return padkit.upsert(script)
+
+
+@app.delete("/api/pad/{sid}")
+def pad_del(sid: str):
+    padkit.delete(sid)
+    return {"ok": True}
+
+
+@app.post("/api/pad/check")
+def pad_check(req: dict):
+    lines = [str(x) for x in req.get("lines", [])][:120]
+    return padkit.check(lines, req.get("id", ""), _project_lines())
+
+
+def _pad_cfg():
+    cfg = ai_cfg()
+    if not ai.ready(cfg):
+        raise HTTPException(400, "需要先在右上角「AI 设置」里接入大模型")
+    return cfg
+
+
+@app.post("/api/pad/write")
+def pad_write(req: dict):
+    cfg = _pad_cfg()
+    try:
+        return padkit.write(cfg, str(req.get("topic", ""))[:80], req.get("type", "口播"), int(req.get("len", 60) or 60),
+                            req.get("hook", ""), req.get("ending", ""), str(req.get("notes", ""))[:2000], _pad_info(),
+                            _pad_avoid(req.get("id", "")))
+    except HTTPException:
+        raise
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(502, "AI 没成功：" + str(e)[:100]) from None
+
+
+@app.post("/api/pad/rewrite")
+def pad_rewrite(req: dict):
+    cfg = _pad_cfg()
+    lines = [str(x) for x in req.get("lines", [])][:120]
+    i = int(req.get("i", 0))
+    if not (0 <= i < len(lines)):
+        raise HTTPException(400, "选中的句子不存在")
+    chk = padkit.check(lines, req.get("id", ""), _project_lines())
+    sim = [f for f in chk["lines"][i]["flags"] if "相似" in f or "重复" in f]
+    avoid = _pad_avoid(req.get("id", "")) + ("\n" + "\n".join(sim) if sim else "")
+    try:
+        return {"cands": padkit.rewrite(cfg, lines, i, req.get("tpl", "fresh"), _pad_info(), avoid)}
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(502, "AI 没成功：" + str(e)[:100]) from None
 
 
 # ---------------------------------------------------------------- 我的词典
@@ -829,6 +978,14 @@ def test_ai(req: AISettings):
     except Exception as e:  # noqa: BLE001
         raise HTTPException(400, str(e)) from None
     return {"ok": True}
+
+
+@app.get("/api/covers/{cid}/preview.jpg")
+def cover_style_preview(cid: str):
+    c = render.get_cover_style(cid)
+    if not c:
+        raise HTTPException(404)
+    return FileResponse(previews.make_cover(c), media_type="image/jpeg")
 
 
 @app.get("/api/templates/{tid}/preview.jpg")
@@ -1032,13 +1189,118 @@ def put_lines(pid: str, req: LinesReq):
                 p["settings"]["sub_pos"] = render.get_template(st["template"])["subtitle"]["pos_y"]
             for k in ("pace", "aspect", "sub_pos", "loudnorm", "template", "stabilize", "enhance", "denoise",
                       "ip_name", "top_title", "text_fx", "bigwords", "sfx", "bgm", "bgm_volume",
-                      "speaker_card", "speaker_name", "speaker_titles"):
+                      "speaker_card", "speaker_name", "speaker_titles", "cover_style", "cover_tag"):
                 if k in st:
                     p["settings"][k] = st[k]
             if "ip_name" in st:
                 save_prefs(ip_name=str(st["ip_name"])[:30])
         save(p)
     return summary(p)
+
+
+# ---------------------------------------------------------------- 字幕的拆分、合并、剪掉单个字
+class LineOpReq(BaseModel):
+    op: str              # split / merge / cut
+    id: int
+    pos: int = 0         # split：在第几个字后面断开（不含高亮符号）
+    a: int = 0           # cut：剪掉第 a 到第 b 个字（不含 b）
+    b: int = 0
+
+
+def _markup(chars):
+    out, cur = "", False
+    for ch, hl in chars:
+        if hl != cur:
+            out += "[" if hl else "]"
+            cur = hl
+        out += ch
+    return out + ("]" if cur else "")
+
+
+def _raw_cut(text, k):
+    """把带 [高亮] 的文字在第 k 个字处切开，高亮跨过切点时两边各自闭合。"""
+    chars = [(ch, hl) for t, hl in engine.parse_markup(text) for ch in t]
+    return _markup(chars[:k]), _markup(chars[k:])
+
+
+def _split_line(l, k):
+    """在第 k 个字处把一句拆成两句；有逐字时间就按字的时间切，否则按字数比例。"""
+    text = engine.plain(l["text"])
+    n = len(text)
+    k = max(1, min(n - 1, k))
+    tt = l.get("tt") or []
+    if len(tt) == n:
+        t_end = min(l["end"], max(l["start"] + 0.05, tt[k - 1][1]))
+        t_start = max(t_end, min(l["end"] - 0.05, tt[k][0]))
+        tl, tr = tt[:k], tt[k:]
+    else:
+        t_end = t_start = l["start"] + (l["end"] - l["start"]) * k / n
+        tl, tr = [], []
+    a, b = _raw_cut(l["text"], k)
+    left = dict(l, text=a, end=round(t_end, 3), tt=tl, punct="")
+    right = dict(l, text=b, start=round(t_start, 3), tt=tr)
+    for d in (left, right):
+        d.pop("start0", None)
+        d.pop("end0", None)
+    return left, right
+
+
+@app.post("/api/projects/{pid}/lines/op")
+def line_op(pid: str, req: LineOpReq):
+    with lock(pid):
+        p = load(pid)
+        lines = p["lines"]
+        idx = next((i for i, l in enumerate(lines) if l["id"] == req.id), None)
+        if idx is None:
+            raise HTTPException(404, "找不到这一句")
+        l = lines[idx]
+        n = len(engine.plain(l["text"]))
+        nid = max(x["id"] for x in lines) + 1
+        if req.op == "split":
+            if n < 2 or not (0 < req.pos < n):
+                raise HTTPException(400, "把光标放在要断开的位置，再点“拆分”")
+            a, b = _split_line(l, req.pos)
+            b["id"] = nid
+            lines[idx:idx + 1] = [a, b]
+        elif req.op == "merge":
+            nxt = next((x for x in lines[idx + 1:]), None)
+            if not nxt:
+                raise HTTPException(400, "已经是最后一句了")
+            if nxt["deleted"] != l["deleted"]:
+                raise HTTPException(400, "一句保留、一句删除的不能合并，先恢复或删除其中一句")
+            ok_tt = len(l.get("tt") or []) == n and len(nxt.get("tt") or []) == len(engine.plain(nxt["text"]))
+            m = dict(l, text=l["text"] + nxt["text"], end=nxt["end"], punct=nxt.get("punct", ""),
+                     tt=(l["tt"] + nxt["tt"]) if ok_tt else [])
+            m.pop("end0", None)
+            lines[idx:idx + 2] = [m]
+        elif req.op == "cut":
+            a, b = max(0, req.a), min(n, req.b)
+            if b <= a:
+                raise HTTPException(400, "先在文字里选中要剪掉的字")
+            if a == 0 and b == n:
+                l["deleted"] = True
+                l["reason"] = "手动剪"
+            else:
+                cur, right = _split_line(l, b) if b < n else (l, None)
+                left, mid = _split_line(cur, a) if a > 0 else (None, cur)
+                mid["deleted"] = True
+                mid["reason"] = "手动剪"
+                parts = [x for x in (left, mid, right) if x]
+                for x in parts[1:]:
+                    x["id"] = nid
+                    nid += 1
+                lines[idx:idx + 1] = parts
+        else:
+            raise HTTPException(400, "未知操作")
+        ids = set()
+        for x in lines:  # 保证编号不重复
+            if x["id"] in ids:
+                x["id"] = nid
+                nid += 1
+            ids.add(x["id"])
+        p["lines"] = lines
+        save(p)
+    return {"project": summary(p) | {"lines": lines}}
 
 
 class ReplaceReq(BaseModel):
@@ -1120,6 +1382,8 @@ class CoverReq(BaseModel):
     subtitle: str = ""
     zoom: float = 1.0
     ratio: str = "9:16"
+    style: str | None = None
+    tag: str | None = None
 
 
 @app.post("/api/projects/{pid}/cover_preview")
@@ -1128,17 +1392,69 @@ def cover_preview(pid: str, req: CoverReq):
     p = load(pid)
     old = p.get("cover") or {}
     manual = old.get("manual") or req.title != old.get("title", "") or req.subtitle != old.get("subtitle", "")
-    p = update(pid, cover={"t": req.t, "title": req.title, "subtitle": req.subtitle, "zoom": req.zoom,
-                           "manual": bool(manual)})
+    style = req.style if req.style is not None else old.get("style") or p["settings"].get("cover_style", "auto")
+    tag = req.tag if req.tag is not None else old.get("tag", p["settings"].get("cover_tag", ""))
+    manual_t = old.get("manual_t") or abs(float(old.get("t", req.t)) - req.t) > 0.05
+    p = update(pid, cover=dict(old, t=req.t, title=req.title, subtitle=req.subtitle, zoom=req.zoom,
+                               manual=bool(manual), style=style, tag=tag, manual_t=bool(manual_t)))
     frame = os.path.join(d, "cover_frame.jpg")
     src = os.path.join(d, "proxy.mp4") if os.path.exists(os.path.join(d, "proxy.mp4")) else work_src(p)
     media.grab_frame(src, req.t, frame)
     W, H = _cover_size(p, req.ratio, 0.5)
     out = os.path.join(d, f"cover_pv_{uuid.uuid4().hex[:6]}.jpg")
-    render.render_cover(frame, req.title, req.subtitle, _tpl_for(p), W, H, out, req.zoom,
-                        p["settings"].get("ip_name", ""), (p["info"]["width"], p["info"]["height"]))
+    _render_cover(p, frame, req.title, req.subtitle, W, H, out, req.zoom, style, tag)
     threading.Timer(5, lambda: os.path.exists(out) and os.remove(out)).start()
     return FileResponse(out, media_type="image/jpeg", headers={"Cache-Control": "no-store"})
+
+
+@app.get("/api/projects/{pid}/covercand/{name}")
+def cover_cand(pid: str, name: str):
+    if not re.fullmatch(r"cand_\d\.jpg", name):
+        raise HTTPException(404)
+    path = os.path.join(pdir(pid), "covers", "cands", name)
+    if not os.path.exists(path):
+        raise HTTPException(404)
+    return FileResponse(path, media_type="image/jpeg")
+
+
+@app.post("/api/projects/{pid}/cover_titles")
+def cover_titles(pid: str):
+    """让 AI 再想一组封面标题（换角度）。"""
+    p = load(pid)
+    cfg = ai_cfg()
+    if not ai.ready(cfg):
+        raise HTTPException(400, "需要先在右上角「AI 设置」里接入大模型")
+    code_t, code_s = titles.extract_by_code(p["lines"])
+    try:
+        pack = titles.package_by_ai(p["lines"], cfg, code_t or "", code_s or "", more=bool((p.get("cover") or {}).get("options")))
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(502, "AI 没成功：" + str(e)[:80]) from None
+    with lock(pid):
+        p = load(pid)
+        cv = p.setdefault("cover", {})
+        olds = cv.get("options") or []
+        seen = {o["title"] for o in olds}
+        cv["options"] = [o for o in pack["options"] if o["title"] not in seen] + olds
+        cv["options"] = cv["options"][:12]
+        if pack["moments"] and not cv.get("moments"):
+            cv["moments"] = pack["moments"]
+        save(p)
+    return {"options": cv["options"]}
+
+
+@app.post("/api/projects/{pid}/cover_frames")
+def cover_frames(pid: str):
+    """重新挑选封面画面候选。"""
+    p = load(pid)
+    src = work_src(p)
+    info = dict(media.probe(src), duration=p["info"]["duration"]) if src.endswith("stab.mp4") else p["info"]
+    cv = p.get("cover") or {}
+    cands = covershot.pick(src, info, p["lines"], cv.get("moments"), os.path.join(pdir(pid), "covers", "cands"))
+    with lock(pid):
+        p = load(pid)
+        p.setdefault("cover", {})["cands"] = cands
+        save(p)
+    return {"cands": cands}
 
 
 class ExportReq(BaseModel):

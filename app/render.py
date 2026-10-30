@@ -94,7 +94,7 @@ def _focus(tpl):
 
 # ---------------------------------------------------------------- 文字工具
 HEAVIER = {"NotoSansSC-Medium.otf": "NotoSansSC-Black.otf", "NotoSansSC-Bold.otf": "NotoSansSC-Black.otf",
-           "NotoSansSC-Black.otf": "NotoSansSC-Black.otf", "NotoSerifSC-Bold.otf": "NotoSerifSC-Bold.otf"}
+           "NotoSansSC-Black.otf": "NotoSansSC-Black.otf", "NotoSerifSC-Bold.otf": "NotoSerifSC-Black.otf", "NotoSerifSC-Black.otf": "NotoSerifSC-Black.otf"}
 
 
 def _run_fonts(runs, st, size):
@@ -433,13 +433,63 @@ def speaker_card(name, titles, W, H, style=None):
         d.text((padx, pady - bb[1]), text, font=f, fill=hex_rgba(fg))
         return im
 
-    if name:
-        ns = st["name_size"] * base
-        blocks.append(block(name, st["name_font"], ns, st["name_color"], st["name_bg"], 1.0, ns * 0.38, ns * 0.24))
-    for t in titles:
-        ls = st["line_size"] * base
-        blocks.append(block(t, st["line_font"], ls, st["line_color"], st["line_bg"], st["line_bg_opacity"],
-                            ls * 0.45, ls * 0.32))
+    mode = st.get("mode", "boxes")
+    if mode == "plain":  # 无底框：彩色姓名 + 白色头衔，靠投影衬托（律师、专家类常见）
+        def plain_line(text, fn, size, color):
+            f = font(fn, size)
+            w = f.getlength(text)
+            if w > max_w:
+                size *= max_w / w
+                f = font(fn, size)
+                w = f.getlength(text)
+            bb = f.getbbox(text)
+            pad = int(size * 0.25)
+            im = Image.new("RGBA", (int(w + pad * 2), int(bb[3] - bb[1] + pad * 2)), (0, 0, 0, 0))
+            d = ImageDraw.Draw(im)
+            sw = max(1, int(size * st.get("stroke", 0.06)))
+            d.text((pad, pad - bb[1]), text, font=f, fill=hex_rgba(color), stroke_width=sw,
+                   stroke_fill=hex_rgba(st.get("stroke_color", "#1A1A1A"), 0.85))
+            return im
+        if name:
+            blocks.append(plain_line(name, st["name_font"], st["name_size"] * base, st["name_color"]))
+        for t in titles:
+            blocks.append(plain_line(t, st["line_font"], st["line_size"] * base, st["line_color"]))
+    elif mode == "panel":  # 半透明底板 + 姓名 + 带圆点的头衔（校长、创始人类常见）
+        ns, ls = st["name_size"] * base, st["line_size"] * base
+        fn, fl = font(st["name_font"], ns), font(st["line_font"], ls)
+        bullet = st.get("bullet", "#E0262E")
+        rows = []
+        if name:
+            rows.append(("n", name, fn))
+        rows += [("t", t, fl) for t in titles]
+        dot = ls * 0.55
+        widths = [f.getlength(t) + (dot * 1.6 if k == "t" else 0) for k, t, f in rows]
+        padx, pady = ns * 0.45, ns * 0.32
+        pw = min(max_w, max(widths) + padx * 2)
+        lh = [((f.getmetrics()[0] + f.getmetrics()[1]) * (1.12 if k == "n" else 1.22)) for k, t, f in rows]
+        ph = sum(lh) + pady * 2
+        im = Image.new("RGBA", (int(pw), int(ph)), (0, 0, 0, 0))
+        d = ImageDraw.Draw(im)
+        d.rounded_rectangle([0, 0, pw - 1, ph - 1], radius=ns * 0.18,
+                            fill=hex_rgba(st.get("panel_bg", "#3A3A3A"), st.get("panel_opacity", 0.55)))
+        y = pady
+        for (k, t, f), h in zip(rows, lh):
+            x = padx
+            if k == "t":
+                cy = y + h * 0.48
+                d.ellipse([x, cy - dot / 2, x + dot, cy + dot / 2], fill=hex_rgba(bullet))
+                x += dot * 1.6
+            d.text((x, y), t, font=f, fill=hex_rgba(st["name_color"] if k == "n" else st["line_color"]))
+            y += h
+        blocks.append(im)
+    else:
+        if name:
+            ns = st["name_size"] * base
+            blocks.append(block(name, st["name_font"], ns, st["name_color"], st["name_bg"], 1.0, ns * 0.38, ns * 0.24))
+        for t in titles:
+            ls = st["line_size"] * base
+            blocks.append(block(t, st["line_font"], ls, st["line_color"], st["line_bg"], st["line_bg_opacity"],
+                                ls * 0.45, ls * 0.32))
     gap = int(base * 0.008)
     cw = max(b.width for b in blocks)
     ch = sum(b.height for b in blocks) + gap * (len(blocks) - 1)
@@ -531,18 +581,22 @@ def _text_lines_block(lines, W, H, st):
         if not text:
             continue
         size = size0 * (st.get("line2_scale", 0.85) if i == 1 else 1.0)
-        f = font(st["font"], size)
+        lst = st
+        if i == 1 and (st.get("line2_font") or st.get("line2_color")):
+            lst = dict(st, font=st.get("line2_font", st["font"]), color=st.get("line2_color", st["color"]),
+                       stroke=st.get("line2_stroke", st.get("stroke", 0)))
+        f = font(lst["font"], size)
         runs = parse_markup(text)
-        if i == 1 and not any(hl for _, hl in runs):
+        if i == 1 and not any(hl for _, hl in runs) and not st.get("line2_color"):
             runs = [(t, True) for t, _ in runs]  # 第二行整行用强调色
-        w = _runs_width(runs, f, st, size)
+        w = _runs_width(runs, f, lst, size)
         max_w = W * st.get("max_width", 0.9)
         if w > max_w:
             size *= max_w / w
-            f = font(st["font"], size)
-            w = _runs_width(runs, f, st, size)
+            f = font(lst["font"], size)
+            w = _runs_width(runs, f, lst, size)
         asc, desc = f.getmetrics()
-        rendered.append((runs, f, size, w, asc + desc))
+        rendered.append((runs, f, size, w, asc + desc, lst))
     if not rendered:
         return out, 0
     gap = size0 * 0.18
@@ -550,13 +604,13 @@ def _text_lines_block(lines, W, H, st):
     cy = H * st.get("center_y", 0.1)
     y = cy - total_h / 2
     if st.get("box_opacity", 0) > 0:
-        bw = max(r[3] for r in rendered) + size0 * 0.8
+        bw = (W if st.get("box_full") else max(r[3] for r in rendered) + size0 * 0.8)
         d = ImageDraw.Draw(out)
         d.rounded_rectangle([(W - bw) / 2, y - size0 * 0.25, (W + bw) / 2, y + total_h + size0 * 0.25],
                             radius=size0 * st.get("box_radius", 0.12),
                             fill=hex_rgba(st.get("box_color", "#000000"), st["box_opacity"]))
-    for runs, f, size, w, lh in rendered:
-        draw_runs(out, runs, f, (W - w) / 2, y, st, size)
+    for runs, f, size, w, lh, lst in rendered:
+        draw_runs(out, runs, f, (W - w) / 2, y, lst, size)
         y += lh + gap
     return out, 0
 
@@ -642,6 +696,21 @@ def _fit_cover(frame, W, H, focus_y=0.4, zoom=1.0):
     return fr.crop((x, y, x + W, y + H))
 
 
+def _beautify(img):
+    """封面轻度美化：自动色阶、偏暗时提亮、略增饱和与锐度。只用在封面，不影响视频。"""
+    from PIL import ImageEnhance, ImageOps, ImageStat
+    rgb = img.convert("RGB")
+    auto = ImageOps.autocontrast(rgb, cutoff=0.8)
+    rgb = Image.blend(rgb, auto, 0.5)
+    mean = sum(ImageStat.Stat(rgb.convert("L")).mean) / 255
+    if mean < 0.45:
+        rgb = ImageEnhance.Brightness(rgb).enhance(min(1.18, 0.47 / max(mean, 0.2)))
+    rgb = ImageEnhance.Color(rgb).enhance(1.08)
+    rgb = ImageEnhance.Contrast(rgb).enhance(1.04)
+    rgb = rgb.filter(ImageFilter.UnsharpMask(radius=2, percent=60, threshold=3))
+    return rgb
+
+
 def _wrap(text, f, max_w, max_lines=2):
     if f.getlength(text) <= max_w or max_lines == 1:
         return [text]
@@ -713,7 +782,7 @@ def render_cover(frame_path, title, subtitle, tpl, W, H, out_path, zoom=1.0, ip_
             img.alpha_composite(ov)
         img.convert("RGB").save(out_path, quality=92)
         return out_path
-    img = _fit_cover(frame, W, H, cv.get("focus_y", 0.4), zoom=zoom).convert("RGBA")
+    img = _beautify(_fit_cover(frame, W, H, cv.get("focus_y", 0.4), zoom=zoom)).convert("RGBA")
     if cv.get("darken", 0) > 0:
         img = Image.alpha_composite(img, Image.new("RGBA", img.size, (0, 0, 0, int(255 * cv["darken"]))))
     for g in cv.get("gradients", []):
@@ -732,6 +801,192 @@ def render_cover(frame_path, title, subtitle, tpl, W, H, out_path, zoom=1.0, ip_
         img.alpha_composite(blk, (x, max(0, y)))
     if cv.get("show_ip") and ip_name and tpl.get("ip_tag"):
         img.alpha_composite(_ip_tag(ip_name, W, H, tpl["ip_tag"]))
+    img.convert("RGB").save(out_path, quality=92)
+    return out_path
+
+
+# ---------------------------------------------------------------- 封面风格（与视频模板分开选）
+COVER_DIR = os.path.join(ROOT, "covers")
+NUM_HL = __import__("re").compile(r"\d+(?:\.\d+)?\s*(?:[%％万千亿元块位个天年月日号岁倍K]|w|W)?")
+
+
+def list_cover_styles():
+    out = []
+    if os.path.isdir(COVER_DIR):
+        for f in sorted(os.listdir(COVER_DIR)):
+            if f.endswith(".json"):
+                with open(os.path.join(COVER_DIR, f), encoding="utf-8") as fp:
+                    c = json.load(fp)
+                c["id"] = f[:-5]
+                out.append(c)
+    return out
+
+
+def get_cover_style(cid):
+    for c in list_cover_styles():
+        if c["id"] == cid:
+            return c
+    return None
+
+
+def _auto_hl(text, mode):
+    if "[" in text or "【" in text or not mode:
+        return text
+    if mode == "numbers":
+        return NUM_HL.sub(lambda m: "[" + m.group(0) + "]", text, count=1)
+    if mode == "tail":  # 后半句强调（“越早买[越划算]”）
+        k = max(2, len(text) // 3)
+        return text[:-k] + "[" + text[-k:] + "]"
+    return text
+
+
+def _rich_block(text, W, st):
+    """封面文字块（支持 [关键词] 换色）：描边、投影、倾斜、底色块、自动换两行。"""
+    lines_raw = [x for x in text.split("\n") if x.strip()] or [text]
+    max_w = W * st.get("max_width", 0.9)
+    size = st["size"] * W
+    fname = st["font"]
+    plain_lines = [engine_plain(x) for x in lines_raw]
+    f = font(fname, size)
+    if len(lines_raw) == 1 and st.get("max_lines", 2) >= 2:
+        one = f.getlength(plain_lines[0])
+        min_size = st.get("min_size", st["size"] * 0.7) * W
+        if one > max_w and size * max_w / one < min_size and len(plain_lines[0]) >= 4:
+            runs = [(ch, hl) for t, hl in parse_markup(lines_raw[0]) for ch in t]
+            cut = (len(runs) + 1) // 2
+            lines_raw = [_runs_markup(runs[:cut]), _runs_markup(runs[cut:])]
+            plain_lines = [engine_plain(x) for x in lines_raw]
+    widest = max(f.getlength(l) for l in plain_lines)
+    if widest > max_w:
+        size *= max_w / widest
+        f = font(fname, size)
+    stroke = int(round(size * st.get("stroke", 0)))
+    asc, desc = f.getmetrics()
+    lh = (asc + desc) * st.get("line_height", 1.1)
+    pad = stroke + int(size * 0.3)
+    bw = int(max(f.getlength(l) for l in plain_lines) + pad * 2 + size * abs(st.get("skew", 0)) + 4)
+    bh = int(lh * len(lines_raw) + pad * 2)
+    layer = Image.new("RGBA", (bw, bh), (0, 0, 0, 0))
+    align = st.get("align", "center")
+
+    def x0(l):
+        return pad if align == "left" else (bw - f.getlength(l)) / 2
+
+    if st.get("box"):
+        bx = st["box"]
+        d = ImageDraw.Draw(layer)
+        if bx.get("per_line"):
+            for i, l in enumerate(plain_lines):
+                xx = x0(l)
+                d.rectangle([xx - size * 0.25, pad + i * lh - size * 0.05, xx + f.getlength(l) + size * 0.25,
+                             pad + i * lh + (asc + desc) * 1.02], fill=hex_rgba(bx.get("color", "#000000"), bx.get("opacity", 0.8)))
+        else:
+            d.rounded_rectangle([pad * 0.3, pad * 0.45, bw - pad * 0.3, bh - pad * 0.25], radius=size * bx.get("radius", 0.12),
+                                fill=hex_rgba(bx.get("color", "#000000"), bx.get("opacity", 0.9)))
+    sc = hex_rgba(st.get("stroke_color", "#000000"))
+
+    def draw(dr, dx, dy, fill_fn, sw, sf):
+        for i, l in enumerate(lines_raw):
+            xx = x0(plain_lines[i]) + dx
+            for t, hl in parse_markup(l):
+                dr.text((xx, pad + i * lh + dy), t, font=f, fill=fill_fn(hl), stroke_width=sw, stroke_fill=sf)
+                xx += f.getlength(t)
+
+    if st.get("shadow", True):
+        sh = Image.new("RGBA", (bw, bh), (0, 0, 0, 0))
+        draw(ImageDraw.Draw(sh), size * 0.04, size * 0.06, lambda hl: (0, 0, 0, 150), stroke, (0, 0, 0, 150))
+        layer = Image.alpha_composite(layer, sh.filter(ImageFilter.GaussianBlur(size * 0.05)))
+    col, hcol = hex_rgba(st["color"]), hex_rgba(st.get("highlight", st["color"]))
+    draw(ImageDraw.Draw(layer), 0, 0, lambda hl: hcol if hl else col, stroke, sc)
+    skew = st.get("skew", 0)
+    if skew:
+        layer = layer.transform(layer.size, Image.AFFINE, (1, skew, -skew * bh / 2, 0, 1, 0), resample=Image.BICUBIC)
+    return layer
+
+
+def engine_plain(t):
+    return "".join(x for x, _ in parse_markup(t))
+
+
+def _runs_markup(chars):
+    out, cur = "", False
+    for ch, hl in chars:
+        if hl != cur:
+            out += "[" if hl else "]"
+            cur = hl
+        out += ch
+    return out + ("]" if cur else "")
+
+
+def _pills(items, W, H, st):
+    """绿色胶囊标签：一行一个，左对齐，常用来放人设亮点。"""
+    out = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    size = st.get("size", 0.045) * W
+    f = font(st.get("font", "NotoSansSC-Black.otf"), size)
+    d = ImageDraw.Draw(out)
+    x, y = W * st.get("x", 0.06), H * st.get("top", 0.08)
+    for t in items[:st.get("max", 3)]:
+        w = f.getlength(t)
+        bb = f.getbbox(t)
+        h = bb[3] - bb[1]
+        px, py = size * 0.6, size * 0.38
+        d.rounded_rectangle([x, y, x + w + px * 2, y + h + py * 2], radius=(h + py * 2) / 2,
+                            fill=hex_rgba(st.get("bg", "#B7F36B")))
+        d.text((x + px, y + py - bb[1]), t, font=f, fill=hex_rgba(st.get("color", "#111111")))
+        y += h + py * 2 + size * st.get("gap", 0.45)
+    return out
+
+
+def render_cover_style(frame_path, style, values, W, H, out_path, zoom=1.0):
+    """按封面风格渲染。values: title / subtitle / tag / ip / name / titles(人设亮点列表)。"""
+    frame = Image.open(frame_path).convert("RGB")
+    img = _beautify(_fit_cover(frame, W, H, style.get("focus_y", 0.35), zoom=zoom)).convert("RGBA")
+    if style.get("darken"):
+        img = Image.alpha_composite(img, Image.new("RGBA", img.size, (0, 0, 0, int(255 * style["darken"]))))
+    for g in style.get("gradients", []):
+        img.alpha_composite(_gradient(W, H, g))
+    for el in style.get("elements", []):
+        src = el.get("source", "title")
+        if el.get("type") == "pills":
+            items = [t for t in values.get("titles") or [] if t]
+            if items:
+                img.alpha_composite(_pills(items, W, H, el))
+            continue
+        text = (values.get(src) or "").strip()
+        if not text and el.get("fallback"):
+            text = (values.get(el["fallback"]) or "").strip()
+        if not text:
+            continue
+        text = el.get("prefix", "") + text + el.get("suffix", "")
+        text = _auto_hl(text, el.get("auto_hl"))
+        if el.get("type") == "watermark":  # 背景大字（空心、半透明）
+            f = font(el.get("font", "NotoSansSC-Black.otf"), el.get("size", 0.32) * W)
+            t = engine_plain(text)[:el.get("max_chars", 2)]
+            lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+            ImageDraw.Draw(lay).text((W * el.get("x", 0.06), H * el.get("top", 0.12)), t, font=f, fill=(0, 0, 0, 0),
+                                     stroke_width=max(2, int(W * 0.004)), stroke_fill=hex_rgba(el.get("color", "#E8762B"), el.get("opacity", 0.8)))
+            img.alpha_composite(lay)
+            continue
+        blk = _rich_block(text, W, el)
+        if el.get("band"):  # 通栏半透明底条
+            bd = el["band"]
+            bh = int(blk.height * bd.get("scale", 0.9))
+            cy = int(H * el.get("center_y", 0.5))
+            band = Image.new("RGBA", (W, bh), hex_rgba(bd.get("color", "#000000"), bd.get("opacity", 0.55)))
+            img.alpha_composite(band, (0, max(0, cy - bh // 2)))
+        al = el.get("align", "center")
+        if al == "left":
+            x = int(W * el.get("x", 0.05))
+        elif al == "right":
+            x = int(W * (1 - el.get("x", 0.05)) - blk.width)
+        else:
+            x = (W - blk.width) // 2
+        if "top" in el:
+            y = int(H * el["top"])
+        else:
+            y = int(H * el.get("center_y", 0.5) - blk.height / 2)
+        y = max(0, min(H - blk.height, y))
+        img.alpha_composite(blk, (max(0, x), y))
     img.convert("RGB").save(out_path, quality=92)
     return out_path
 

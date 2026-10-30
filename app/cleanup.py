@@ -233,7 +233,14 @@ def build_lines(units, max_chars=13):
         for p in parts:
             if not p:
                 continue
+            tt = []  # 每个字的起止时间（英文单词按字母平分），用于手动拆分、剪掉单个字
+            for x in p:
+                L = max(1, len(x["w"]))
+                for k in range(L):
+                    a = x["s"] + (x["e"] - x["s"]) * k / L
+                    tt.append([round(a, 3), round(x["s"] + (x["e"] - x["s"]) * (k + 1) / L, 3)])
             lines.append({
+                "tt": tt,
                 "text": _text(p),
                 "punct": p[-1]["pa"],
                 "start": round(p[0]["s"] - 0.04, 3),

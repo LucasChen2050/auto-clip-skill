@@ -19,4 +19,4 @@ if [ ! -f runtime/.ready ]; then
   touch runtime/.ready
 fi
 
-./runtime/bin/python3 run.py
+PYTHONNOUSERSITE=1 PYTHONHOME= PYTHONPATH= ./runtime/bin/python3 -s -E run.py

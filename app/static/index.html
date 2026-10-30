@@ -56,6 +56,35 @@ h2{font-size:22px;margin:0 0 4px}
 .progress i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .3s}
 .notice{display:flex;gap:16px;align-items:center;background:#FFF8E6;border:1px solid #F3E2B3;border-radius:12px;padding:14px 18px;margin-bottom:20px}
 .notice.err{background:#FDECEC;border-color:#F3C3C3}
+/* 口播稿 */
+.pad{display:grid;grid-template-columns:300px minmax(0,1fr) 280px;gap:20px;align-items:start}
+@media (max-width:1100px){.pad{grid-template-columns:1fr}}
+.pad .card{padding:20px}
+.pad textarea.sel{resize:vertical;line-height:1.6;font:inherit}
+.plist{display:flex;flex-direction:column;gap:4px;max-height:240px;overflow:auto;margin-top:6px}
+.plist button{border:0;background:none;text-align:left;padding:7px 10px;border-radius:8px;color:var(--ink2);display:flex;justify-content:space-between;gap:8px}
+.plist button:hover{background:#F6F3EE}
+.plist button.on{background:var(--accent-soft);color:var(--ink);font-weight:600}
+.pl{padding:8px 12px;border-radius:10px;border:1.5px solid transparent;font-size:17px;line-height:1.8}
+.pl:hover{background:#FBFAF7}
+.pl.sel{border-color:var(--accent);background:#FFFCFA}
+.pl .tx{outline:none}
+.pl .fl{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.pl .fl span{font-size:11px;color:#8A4B00;background:#FFF1D6;border-radius:6px;padding:1px 7px;line-height:1.7}
+.tpls2{display:none;gap:6px;flex-wrap:wrap;margin-top:10px}
+.pl.sel .tpls2{display:flex}
+.tpls2 button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 10px;font-size:13px;color:var(--ink2)}
+.tpls2 button:hover{border-color:var(--accent);color:var(--accent)}
+.tpls2 button.del{color:var(--ink3)}
+.pcand{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid #F1D6CE;border-radius:9px;padding:9px 12px;margin-top:6px;font-size:15px;line-height:1.7}
+.pcand span{flex:1}
+.ck{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #F1EDE6;font-size:13px}
+.ck:last-child{border-bottom:0}
+.ck b.ok{color:var(--ok)}.ck b.warn{color:#B4590B}
+.prompter{position:fixed;inset:0;background:#0E0D0C;color:#fff;z-index:90;display:flex;flex-direction:column}
+.prompter .pt{flex:1;overflow:hidden;position:relative}
+.prompter .pi{position:absolute;left:0;right:0;padding:40vh 12vw;font-size:44px;line-height:1.7;font-weight:700}
+.prompter .pc{display:flex;gap:8px;align-items:center;padding:12px 20px;background:#1C1A18;flex-wrap:wrap}
 /* 导入 */
 .drop{border:2px dashed #D9D2C7;border-radius:var(--radius);padding:48px 24px;text-align:center;cursor:pointer;transition:.2s;background:#FCFBF9}
 .drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft)}
@@ -77,6 +106,22 @@ h2{font-size:22px;margin:0 0 4px}
 .tpls.mini .tpl img{margin-bottom:6px}
 .tpls.mini .tpl b{font-size:12px}
 .tpls.mini .tpl small{display:none}
+.topts{display:flex;flex-direction:column;gap:6px;margin:-4px 0 12px}
+.topt{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff;cursor:pointer;text-align:left;font-size:13px}
+.topt:hover{border-color:var(--accent)}
+.topt b{font-size:14px}
+.topt i{font-style:normal;font-size:11px;color:var(--accent);background:#FDF0EC;border-radius:6px;padding:1px 6px;white-space:nowrap}
+.topt span{color:var(--ink3)}
+.fcands{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:6px}
+.fcands button{border:1.5px solid var(--line);border-radius:8px;padding:0;overflow:hidden;cursor:pointer;background:#000;aspect-ratio:9/14;position:relative}
+.fcands button.on{border-color:var(--accent);box-shadow:0 0 0 2px #F8D5CC}
+.fcands img{width:100%;height:100%;object-fit:cover;display:block}
+.fcands small{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);color:#fff;font-size:10px;padding:2px 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cstyles{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:6px}
+.cstyles button{border:1.5px solid var(--line);border-radius:9px;background:#fff;padding:4px;cursor:pointer;font-size:11px;color:var(--ink2)}
+.cstyles button.on{border-color:var(--accent);color:var(--ink);font-weight:600}
+.cstyles img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:6px;display:block;margin-bottom:3px;background:#EEE}
+.cstyles .auto{display:grid;place-items:center;aspect-ratio:3/4;border-radius:6px;background:#F0EDE8;margin-bottom:3px;font-size:12px}
 .opts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
 .sel{width:100%;border:1px solid var(--line);border-radius:9px;padding:7px 10px;background:#fff}
 .musicbox{background:#FAF8F5;border:1px solid var(--line);border-radius:12px;padding:12px}
@@ -144,7 +189,7 @@ h2{font-size:22px;margin:0 0 4px}
 .ln.del .render{color:var(--ink3);text-decoration:line-through}
 .ln.del .render em{background:#eee;color:var(--ink3)}
 .ln .ops{display:flex;gap:4px;align-items:center}
-.ln .ops button{border:0;background:transparent;color:var(--ink3);padding:4px 8px;border-radius:6px;font-size:12px}
+.ln .ops button{border:0;background:transparent;color:var(--ink3);padding:4px 5px;white-space:nowrap;border-radius:6px;font-size:12px}
 .ln .ops button:hover{background:#EFEBE5;color:var(--ink)}
 .tag{font-size:11px;background:#F1EEE9;color:var(--ink2);padding:1px 6px;border-radius:99px;white-space:nowrap}
 .toggles{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
@@ -190,7 +235,7 @@ h2{font-size:22px;margin:0 0 4px}
 <body>
 <header><div class="wrap bar">
   <div class="logo"><i class="brandI">剪</i><span class="brandT">全自动化剪辑 Skill</span><span class="brandBy"></span> <span class="badge">本地运行</span></div>
-  <nav class="mods" id="mods"><button data-m="script">口播脚本</button><button data-m="ip">IP 打造</button><button data-m="clip" class="on">智能剪辑</button></nav>
+  <nav class="mods" id="mods"><button data-m="pad" class="hidden">口播稿</button><button data-m="script">口播脚本</button><button data-m="ip">IP 打造</button><button data-m="clip" class="on">智能剪辑</button></nav>
   <span class="hint hidden" id="userChip" style="margin:0 0 0 auto;white-space:nowrap"></span>
   <button class="btn small ghost" id="dictBtn" style="margin-left:auto">我的词典</button>
   <button class="btn small ghost" id="aiBtn" style="margin-left:8px">AI 设置</button>
@@ -222,7 +267,15 @@ h2{font-size:22px;margin:0 0 4px}
           <div id="uploads"></div>
         </div>
         <div class="card" style="margin-top:16px">
-          <div class="label">剪辑模板</div>
+          <div class="label">① 人设介绍（每条视频开头约 4 秒显示姓名和头衔，建议填写）</div>
+          <div class="musicbox spkbox" style="margin-bottom:18px">
+            <label class="row" style="gap:8px;margin-bottom:8px"><input type="checkbox" id="bSpk">显示主讲人介绍卡</label>
+            <div class="row" style="gap:10px;align-items:flex-start;flex-wrap:wrap">
+              <input type="text" id="bSpkN" class="sel" maxlength="16" placeholder="姓名，如：张三" style="width:170px">
+              <textarea id="bSpkT" class="sel" rows="3" maxlength="90" placeholder="头衔，每行一个，最多 3 行&#10;如：某某品牌 创始人&#10;10 年外贸经验" style="flex:1;min-width:220px;resize:vertical;font:inherit"></textarea></div>
+            <div class="hint" style="margin:6px 0 0">不填姓名时用账号名；姓名和头衔都不填就不显示。</div>
+          </div>
+          <div class="label">② 剪辑模板</div>
           <div class="tpls mini" id="tpls"></div>
           <div class="opts">
             <div><div class="label">节奏</div><div class="seg" id="pace"><button data-v="fast">紧凑</button><button data-v="normal">标准</button><button data-v="slow">舒缓</button></div></div>
@@ -230,14 +283,8 @@ h2{font-size:22px;margin:0 0 4px}
             <div><div class="label">画幅</div><select id="bAspect" class="sel"><option value="original">保持原比例</option><option value="9:16">竖屏 9:16</option><option value="3:4">3:4</option><option value="16:9">横屏 16:9</option></select></div>
             <div><div class="label">账号名（画面角落，可留空）</div><input type="text" id="bIp" class="sel" maxlength="20" placeholder="@你的账号名"></div>
           </div>
-          <div class="label" style="margin-top:18px">主讲人介绍（开头约 4 秒显示姓名和头衔）</div>
-          <div class="musicbox spkbox">
-            <label class="row" style="gap:8px;margin-bottom:8px"><input type="checkbox" id="bSpk">显示主讲人介绍卡</label>
-            <div class="row" style="gap:10px;align-items:flex-start;flex-wrap:wrap">
-              <input type="text" id="bSpkN" class="sel" maxlength="16" placeholder="姓名，如：张三" style="width:170px">
-              <textarea id="bSpkT" class="sel" rows="3" maxlength="90" placeholder="头衔，每行一个，最多 3 行&#10;如：某某品牌 创始人&#10;10 年外贸经验" style="flex:1;min-width:220px;resize:vertical;font:inherit"></textarea></div>
-            <div class="hint" style="margin:6px 0 0">不填姓名时用上面的账号名；姓名和头衔都不填就不显示。</div>
-          </div>
+          <div class="label" style="margin-top:18px">封面风格 <span class="hint" style="font-weight:400">（之后每条视频的封面默认用这个，单条可在封面页再换）</span></div>
+          <div class="cstyles" id="bCStyles" style="grid-template-columns:repeat(5,1fr)"></div>
           <div class="label musicui" style="margin-top:18px">背景音乐</div>
           <div class="musicbox musicui">
             <div class="row" style="gap:8px;flex-wrap:nowrap"><select id="bBgm" class="sel" style="flex:1"></select>
@@ -332,7 +379,7 @@ h2{font-size:22px;margin:0 0 4px}
             <div class="row" style="gap:6px"><input type="text" id="fFind" placeholder="识别错的词"><span>→</span><input type="text" id="fRep" placeholder="正确的词"><button class="btn small ghost" id="fBtn">替换</button></div>
             <label class="hint" style="display:flex;gap:4px;align-items:center;margin:6px 0 0"><input type="checkbox" id="fRem" checked>记住这个纠正（写进<a href="#" onclick="openDict();return false" style="color:var(--accent)">我的词典</a>），以后的视频自动替换</label></div>
         </div>
-        <div class="hint">点句子可预览；直接改字。灰色划线的是自动剪掉的重说、卡顿和语气词，点「恢复」可找回。用 <code>[ ]</code> 包住的字显示为<b style="color:#C79A00">黄色高亮</b>——选中文字点「高亮」即可。删掉的句子不会出现在成片里。</div>
+        <div class="hint">点句子可预览；直接改字。灰色划线的是自动剪掉的重说、卡顿和语气词，点「恢复」可找回。用 <code>[ ]</code> 包住的字显示为<b style="color:#C79A00">黄色高亮</b>——选中文字点「高亮」即可。删掉的句子不会出现在成片里。<br><b>一行字太多</b>：光标放在要断开处按回车（或点「拆分」）；<b>两行合成一行</b>：点「合并↓」；<b>只剪掉几个字</b>：选中这几个字点「剪选中」，声音和画面一起剪掉。</div>
         <div class="lines" id="lines"></div>
         <div class="foot">
           <span class="hint" id="saveHint"></span>
@@ -352,10 +399,16 @@ h2{font-size:22px;margin:0 0 4px}
       <div class="card">
         <h2>封面</h2>
         <p class="sub">导出时会同时生成 9:16 和 3:4 两个尺寸。</p>
-        <div class="field"><div class="label">主标题 <span class="hint" style="font-weight:400">（部分模板也会作为视频顶部常驻标题）</span></div><input type="text" id="cTitle" maxlength="24" placeholder="例如：外贸人必看"></div>
+        <div class="field"><div class="label">封面风格</div><div class="cstyles" id="cStyles"></div></div>
+        <div class="field"><div class="label">主标题 <span class="hint" style="font-weight:400">（部分模板也会作为视频顶部常驻标题）</span>
+          <button class="btn small ghost" id="moreTitles" style="float:right;margin-top:-6px">AI 再想几个</button></div><input type="text" id="cTitle" maxlength="24" placeholder="例如：外贸人必看"></div>
+        <div class="topts" id="tOpts"></div>
         <div class="chips" id="chips"></div>
         <div class="field"><div class="label">副标题</div><input type="text" id="cSub" maxlength="24" placeholder="例如：欢迎各位积极参与"></div>
-        <div class="field"><div class="label">封面画面 <span id="cTime" style="float:right;font-weight:400"></span></div><input type="range" id="cT" min="0" step="0.1"></div>
+        <div class="field"><div class="label">角标 / 话题 <span class="hint" style="font-weight:400">（部分风格显示，如“第一期”“外贸干货”；人设亮点取自主讲人头衔）</span></div><input type="text" id="cTag" maxlength="12" placeholder="例如：第一期"></div>
+        <div class="field"><div class="label">封面画面 <span class="hint" style="font-weight:400">（已按清晰度、曝光和内容挑好，点小图切换）</span><span id="cTime" style="float:right;font-weight:400"></span></div>
+          <div class="fcands" id="fCands"></div>
+          <input type="range" id="cT" min="0" step="0.1" aria-label="手动选择封面画面"></div>
         <div class="field"><div class="label">画面放大</div><input type="range" id="cZoom" min="1" max="1.6" step="0.02" value="1"></div>
         <div class="foot"><button class="btn ghost" id="backReview">← 返回校对</button><button class="btn accent" id="toExport">下一步：导出 →</button></div>
       </div>
@@ -392,6 +445,42 @@ h2{font-size:22px;margin:0 0 4px}
   </section>
 </main>
 
+
+<main class="wrap hidden" id="mod-pad" style="padding:28px 24px 80px">
+  <div class="row" style="justify-content:space-between;margin-bottom:18px">
+    <div><h2>口播稿</h2><p class="sub" style="margin:0">先写好稿再录：AI 按你的人设写稿，每一句都能用网感句式单独改写，并自动查重、查套话</p></div>
+    <div class="row"><button class="btn ghost" id="pdCopy">复制全文</button><button class="btn ghost" id="pdTxt">下载 .txt</button><button class="btn accent" id="pdPrompt">打开提词器</button></div>
+  </div>
+  <div class="pad">
+    <div class="card">
+      <div class="row" style="justify-content:space-between"><div class="label" style="margin:0">我的稿子</div><button class="btn small ghost" id="pdNew">＋ 新稿</button></div>
+      <div class="plist" id="pdList"></div>
+      <div style="border-top:1px solid var(--line);margin:14px 0"></div>
+      <div class="label">主题</div><input class="sel" id="pdTopic" placeholder="例如：老板用 AI 的三个误区">
+      <div class="label" style="margin-top:12px">类型</div><select class="sel" id="pdType"></select>
+      <div class="label" style="margin-top:12px">时长</div><div class="seg" id="pdLen"><button data-v="30">30 秒</button><button data-v="60" class="on">60 秒</button><button data-v="90">90 秒</button></div>
+      <div class="label" style="margin-top:12px">开头句式</div><select class="sel" id="pdHook"></select>
+      <div class="label" style="margin-top:12px">结尾句式</div><select class="sel" id="pdEnd"></select>
+      <div class="label" style="margin-top:12px">补充素材（案例、数字、活动信息）</div><textarea class="sel" id="pdNotes" rows="4" placeholder="写得越具体，稿子越不空"></textarea>
+      <div class="row" style="margin-top:14px"><button class="btn accent" id="pdWrite" style="flex:1">AI 写一版</button><button class="btn ghost" id="pdPaste">粘贴已有稿</button></div>
+      <p class="hint">人设（姓名、头衔）取自剪辑页的「人设介绍」，专有名词取自「我的词典」。</p>
+    </div>
+    <div class="card">
+      <div class="row" style="justify-content:space-between;margin-bottom:8px"><div class="label" style="margin:0" id="pdMeta">点一句，可以用网感句式单独改写；其他句子不动</div><button class="btn small ghost" id="pdAdd">＋ 加一句</button></div>
+      <div id="pdEd"></div>
+    </div>
+    <div class="card">
+      <div class="label">发布前检查</div>
+      <div id="pdChecks"><p class="hint">有稿子后自动检查</p></div>
+      <button class="btn ghost small" id="pdFix" style="margin-top:10px;width:100%">把标出问题的句子换个说法</button>
+      <p class="hint">查重范围：你以前写的稿子 + 最近剪过的视频字幕。相似的句子会被标出来，减少“每条都差不多”。</p>
+    </div>
+  </div>
+  <div class="modal hidden" id="pdPasteBox"><div class="box"><h2>粘贴已有稿子</h2><textarea class="sel" id="pdPasteTx" rows="10" style="resize:vertical" placeholder="按句号、问号、换行自动分句"></textarea>
+    <div class="foot"><button class="btn ghost" id="pdPasteNo">取消</button><button class="btn accent" id="pdPasteOk">放进编辑器</button></div></div></div>
+</main>
+<div class="prompter hidden" id="pdP"><div class="pt"><div class="pi" id="pdPI"></div></div>
+  <div class="pc"><button class="btn accent small" id="pdPPlay">开始滚动</button><button class="btn ghost small" id="pdPSlow" style="color:#fff">慢一点</button><button class="btn ghost small" id="pdPFast" style="color:#fff">快一点</button><button class="btn ghost small" id="pdPBig" style="color:#fff">字大</button><button class="btn ghost small" id="pdPSmall" style="color:#fff">字小</button><button class="btn ghost small" id="pdPMir" style="color:#fff">镜像</button><span style="color:#9a948b;font-size:12px">空格开始/暂停，Esc 退出</span><button class="btn ghost small" id="pdPClose" style="color:#fff;margin-left:auto">退出</button></div></div>
 <iframe class="mod hidden" id="mod-script" title="口播脚本"></iframe>
 <iframe class="mod hidden" id="mod-ip" title="IP 打造"></iframe>
 
@@ -497,6 +586,7 @@ function renderBatch() {
   renderMusicSelect($('#bBgm'), b.bgm || 'auto', b.template);
   $('#bEnh').checked = b.enhance !== false; $('#bDen').checked = b.denoise !== false;
   $('#bSpk').checked = b.speaker_card !== false;
+  renderCoverStyles($('#bCStyles'), b.cover_style || 'auto', v => saveBatch({cover_style: v}));
   if (document.activeElement !== $('#bSpkN')) $('#bSpkN').value = b.speaker_name || '';
   if (document.activeElement !== $('#bSpkT')) $('#bSpkT').value = b.speaker_titles || '';
   const ok = st.ai_ready; $('#useAi').disabled = !ok; $('#useAi').checked = ok && b.use_ai !== false;
@@ -781,6 +871,9 @@ function renderLines() {
       <div class="txt"><input value="${esc(l.text)}" spellcheck="false"><div class="render">${markup(l.text)}</div></div>
       <div class="ops">${l.reason ? `<span class="tag">${l.reason}</span>` : ''}
         <button data-a="hl" title="选中文字后点击">高亮</button>
+        <button data-a="split" title="把光标放在要断开的地方再点（或直接按回车）">拆分</button>
+        <button data-a="merge" title="和下一句合成一行">合并↓</button>
+        <button data-a="cut" title="选中几个字再点，只剪掉这几个字的声音和画面">剪选中</button>
         <button data-a="del">${l.deleted ? '恢复' : '删除'}</button></div>
     </div>`).join('');
   box.querySelectorAll('.ln').forEach(row => {
@@ -803,7 +896,24 @@ function renderLines() {
       inp.value = l.text; row.querySelector('.render').innerHTML = markup(l.text); queueSave();
     };
     row.querySelector('[data-a=del]').onclick = () => { l.deleted = !l.deleted; renderLines(); queueSave(true) };
+    const plainIdx = i => inp.value.slice(0, i).replace(/[\[\]【】]/g, '').length;
+    ['split', 'merge', 'cut'].forEach(op => row.querySelector(`[data-a=${op}]`).onmousedown = e => e.preventDefault());
+    row.querySelector('[data-a=split]').onclick = () => lineOp({op: 'split', id, pos: plainIdx(inp.selectionStart || sel[0])});
+    row.querySelector('[data-a=merge]').onclick = () => lineOp({op: 'merge', id});
+    row.querySelector('[data-a=cut]').onclick = () => {
+      let [a, b] = [inp.selectionStart, inp.selectionEnd]; if (a === b) [a, b] = sel;
+      lineOp({op: 'cut', id, a: plainIdx(a), b: plainIdx(b)});
+    };
+    inp.onkeydown = e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); lineOp({op: 'split', id, pos: plainIdx(inp.selectionStart)}) } };
   });
+}
+async function lineOp(body) {
+  try {
+    clearTimeout(saveT); await saveLines();  // 先保存正在改的文字
+    const r = await jpost(`api/projects/${S.P.id}/lines/op`, body);
+    S.P.lines = r.project.lines; S.P.intervals = r.project.intervals; S.P.out_duration = r.project.out_duration;
+    renderLines(); stats(); sizeStage();
+  } catch (e) { toast(e.message) }
 }
 function queueSave(now) {
   $('#saveHint').textContent = '保存中…';
@@ -880,29 +990,52 @@ function setupCover() {
   // 用字幕里的高亮关键词和句子做标题建议
   const sug = [];
   S.P.lines.filter(l => !l.deleted).forEach(l => (l.text.match(/[\[【][^\]】]+[\]】]/g) || []).forEach(m => { m = m.slice(1, -1); if (m.length > 1 && !sug.includes(m)) sug.push(m) }));
-  $('#chips').innerHTML = sug.length ? '<span class="hint" style="margin:3px 4px 0 0">建议：</span>' + sug.slice(0, 8).map(x => `<button>${esc(x)}</button>`).join('') : '';
+  $('#chips').innerHTML = sug.length && !(c.options || []).length ? '<span class="hint" style="margin:3px 4px 0 0">关键词：</span>' + sug.slice(0, 8).map(x => `<button>${esc(x)}</button>`).join('') : '';
   $('#chips').querySelectorAll('button').forEach(b => b.onclick = () => { $('#cTitle').value = b.textContent; coverPreview() });
   $('#cTitle').value = c.title || sug[0] || ''; $('#cSub').value = c.subtitle || '';
+  renderTitleOpts(c.options || []); renderFrameCands(c.cands || [], c.t);
+  S.cstyle = c.style || S.P.settings.cover_style || 'auto'; $('#cTag').value = c.tag ?? (S.P.settings.cover_tag || '');
+  renderCoverStyles($('#cStyles'), S.cstyle, v => { S.cstyle = v; coverPreview() });
   $('#cT').max = Math.max(0.1, S.P.info.duration - 0.1); $('#cT').value = c.t ?? 1; $('#cZoom').value = c.zoom || 1;
   seg($('#cRatio'), S.ratio, v => { S.ratio = v; coverPreview() });
   coverPreview();
 }
+function renderTitleOpts(opts) {
+  $('#tOpts').innerHTML = opts.length ? opts.map((o, i) => `<button class="topt" data-i="${i}"><i>${esc(o.angle || '方案')}</i><b>${esc(o.title)}</b><span>${esc(o.subtitle || '')}</span></button>`).join('')
+    : (S.status.ai_ready ? '' : '<div class="hint" style="margin:0">接入 AI 后，会根据全片内容给出 5 个更吸引点击的标题方案。</div>');
+  $('#tOpts').querySelectorAll('.topt').forEach(b => b.onclick = () => { const o = opts[+b.dataset.i]; $('#cTitle').value = o.title; $('#cSub').value = o.subtitle || ''; coverPreview() });
+}
+function renderFrameCands(cands, cur) {
+  $('#fCands').innerHTML = cands.map((c, i) => `<button data-t="${c.t}" class="${Math.abs(c.t - cur) < 0.06 ? 'on' : ''}" title="${esc(c.why || '')} ${fmt(c.t)}"><img src="api/projects/${S.P.id}/covercand/${c.thumb}?v=${Date.now() % 1e6}" alt="候选画面 ${i + 1}" loading="lazy">${c.why ? `<small>${esc(c.why)}</small>` : ''}</button>`).join('');
+  $('#fCands').querySelectorAll('button').forEach(b => b.onclick = () => { $('#cT').value = b.dataset.t; $('#fCands').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); coverPreview() });
+}
+$('#moreTitles').onclick = async () => {
+  const b = $('#moreTitles'); b.disabled = true; b.textContent = 'AI 思考中…';
+  try { const r = await jpost(`api/projects/${S.P.id}/cover_titles`, {}); S.P.cover = Object.assign(S.P.cover || {}, {options: r.options}); renderTitleOpts(r.options); toast('换了一批新标题') }
+  catch (e) { toast(e.message) } finally { b.disabled = false; b.textContent = 'AI 再想几个' }
+};
+function renderCoverStyles(box, cur, onPick) {
+  const list = [{id: 'auto', name: '跟随模板'}].concat(S.status.cover_styles || []);
+  box.innerHTML = list.map(c => `<button data-id="${c.id}" class="${c.id === cur ? 'on' : ''}" title="${esc(c.desc || '使用视频模板自带的封面样式')}">${c.id === 'auto' ? '<div class="auto">模板</div>' : `<img src="api/covers/${c.id}/preview.jpg" loading="lazy" alt="">`}${esc(c.name)}</button>`).join('');
+  box.querySelectorAll('button').forEach(b => b.onclick = () => { box.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); onPick(b.dataset.id) });
+}
+function coverBody() { return {t: +$('#cT').value, title: $('#cTitle').value, subtitle: $('#cSub').value, zoom: +$('#cZoom').value, ratio: S.ratio, style: S.cstyle || 'auto', tag: $('#cTag').value} }
 function coverPreview() {
   $('#cTime').textContent = fmt(+$('#cT').value);
   clearTimeout(cvT);
   cvT = setTimeout(async () => {
-    const body = {t: +$('#cT').value, title: $('#cTitle').value, subtitle: $('#cSub').value, zoom: +$('#cZoom').value, ratio: S.ratio};
-    S.P.cover = body;
+    const body = coverBody();
+    S.P.cover = Object.assign(S.P.cover || {}, body);
     const r = await jpost(`api/projects/${S.P.id}/cover_preview`, body);
     const b = await r.blob(); const u = URL.createObjectURL(b);
     const img = $('#cImg'); const old = img.src; img.src = u; if (old.startsWith('blob:')) URL.revokeObjectURL(old);
   }, 250);
 }
-['#cTitle', '#cSub', '#cT', '#cZoom'].forEach(s => $(s).oninput = coverPreview);
+['#cTitle', '#cSub', '#cT', '#cZoom', '#cTag'].forEach(s => $(s).oninput = coverPreview);
 
 // ---------------- 导出
 $('#toExport').onclick = async () => { await coverPreviewNow(); show(4); setupExport() };
-async function coverPreviewNow() { clearTimeout(cvT); const body = {t: +$('#cT').value, title: $('#cTitle').value, subtitle: $('#cSub').value, zoom: +$('#cZoom').value, ratio: S.ratio}; await jpost(`api/projects/${S.P.id}/cover_preview`, body) }
+async function coverPreviewNow() { clearTimeout(cvT); await jpost(`api/projects/${S.P.id}/cover_preview`, coverBody()) }
 $('#backCover').onclick = () => { show(3); setupCover() };
 function setupExport() {
   const P = S.P;
@@ -949,6 +1082,7 @@ function showMod(m) {
   document.querySelectorAll('#mods button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
   S.mod = m;
   $('#mod-clip').classList.toggle('hidden', m !== 'clip'); $('#stepsBar').classList.toggle('hidden', m !== 'clip' || S.view === 0);
+  $('#mod-pad').classList.toggle('hidden', m !== 'pad'); if (m === 'pad') padOpen();
   Object.keys(MODS).forEach(k => {
     const f = $('#mod-' + k); f.classList.toggle('hidden', k !== m);
     if (k === m && !f.src) f.src = MODS[k];
@@ -957,6 +1091,121 @@ function showMod(m) {
   try { localStorage.setItem('mod', m) } catch (e) {}
 }
 document.querySelectorAll('#mods button').forEach(b => b.onclick = () => showMod(b.dataset.m));
+
+
+// ---------------- 口播稿
+const PD = {list: [], tpls: [], types: [], cur: null, sel: -1, cands: [], check: null, loaded: false};
+async function padOpen() {
+  if (!PD.loaded) {
+    const d = await api('api/pad'); PD.list = d.scripts; PD.tpls = d.templates; PD.types = d.types; PD.loaded = true;
+    $('#pdType').innerHTML = PD.types.map(t => `<option>${t}</option>`).join('');
+    const opener = PD.tpls.filter(t => !['golden', 'interact', 'plain', 'short', 'fresh'].includes(t.id));
+    $('#pdHook').innerHTML = '<option value="">让 AI 决定</option>' + opener.map(t => `<option value="${t.id}">${t.name}：${esc(t.ex)}</option>`).join('');
+    $('#pdEnd').innerHTML = '<option value="">让 AI 决定</option>' + PD.tpls.filter(t => ['golden', 'interact', 'contrast', 'suspense'].includes(t.id)).map(t => `<option value="${t.id}">${t.name}：${esc(t.ex)}</option>`).join('');
+    PD.cur = PD.list[0] ? JSON.parse(JSON.stringify(PD.list[0])) : padBlank();
+  }
+  padRender();
+}
+const padBlank = () => ({id: '', topic: '', type: '口播', len: 60, lines: []});
+function padRenderList() {
+  $('#pdList').innerHTML = PD.list.length ? PD.list.map(x => `<button data-id="${x.id}" class="${PD.cur && x.id === PD.cur.id ? 'on' : ''}"><span>${esc(x.topic || '未命名')}</span><small style="color:var(--ink3)">${x.lines.length} 句</small></button>`).join('') : '<p class="hint" style="margin:4px 2px">还没有稿子</p>';
+  $('#pdList').querySelectorAll('button').forEach(b => b.onclick = () => { PD.cur = JSON.parse(JSON.stringify(PD.list.find(x => x.id === b.dataset.id))); PD.sel = -1; PD.cands = []; padRender() });
+}
+function padRender() {
+  const c = PD.cur; padRenderList();
+  if (document.activeElement !== $('#pdTopic')) $('#pdTopic').value = c.topic || '';
+  $('#pdType').value = c.type || '口播';
+  $('#pdLen').querySelectorAll('button').forEach(b => b.classList.toggle('on', +b.dataset.v === (c.len || 60)));
+  padRenderEd(); padCheck();
+}
+function padRenderEd() {
+  const c = PD.cur, flags = (PD.check?.lines || []);
+  if (!c.lines.length) { $('#pdEd').innerHTML = '<div class="hint" style="padding:30px;text-align:center;border:1px dashed var(--line);border-radius:12px">填好主题点「AI 写一版」，或者「粘贴已有稿」开始。</div>'; return }
+  const tb = PD.tpls.map(t => `<button data-t="${t.id}" title="${esc(t.desc)}">${t.name}</button>`).join('');
+  $('#pdEd').innerHTML = c.lines.map((l, i) => `<div class="pl ${i === PD.sel ? 'sel' : ''}" data-i="${i}">
+      <div class="tx" contenteditable="true" spellcheck="false">${esc(l)}</div>
+      ${(flags[i]?.flags || []).length ? `<div class="fl">${flags[i].flags.map(f => `<span>${esc(f)}</span>`).join('')}</div>` : ''}
+      ${i === PD.sel ? `<div class="tpls2">${tb}<button class="del" data-t="__del">删除这句</button></div>${PD.cands.map((x, k) => `<div class="pcand"><span>${esc(x)}</span><button class="btn small accent" data-c="${k}">替换</button></div>`).join('')}` : ''}
+    </div>`).join('');
+  $('#pdEd').querySelectorAll('.pl').forEach(div => {
+    const i = +div.dataset.i, tx = div.querySelector('.tx');
+    tx.onfocus = () => { if (PD.sel !== i) { PD.sel = i; PD.cands = []; padRenderEd(); const n = $('#pdEd').querySelector(`[data-i="${i}"] .tx`); n.focus(); const r = document.createRange(); r.selectNodeContents(n); r.collapse(false); const s = getSelection(); s.removeAllRanges(); s.addRange(r) } };
+    tx.oninput = () => { c.lines[i] = tx.textContent; padSaveSoon() };
+    tx.onkeydown = e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); tx.blur() } };
+    div.querySelectorAll('[data-t]').forEach(b => { b.onmousedown = e => e.preventDefault(); b.onclick = () => padRewrite(i, b.dataset.t, b) });
+    div.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { c.lines[i] = PD.cands[+b.dataset.c]; PD.cands = []; padSave(); padRenderEd(); padCheck() });
+  });
+}
+let pdT = null;
+function padSaveSoon() { clearTimeout(pdT); pdT = setTimeout(() => { padSave(); padCheck() }, 600) }
+async function padSave() {
+  const c = PD.cur; c.topic = $('#pdTopic').value.trim(); if (!c.lines.length && !c.topic) return;
+  const r = await jpost('api/pad', c, 'PUT'); c.id = r.id;
+  PD.list = [r].concat(PD.list.filter(x => x.id !== r.id)); padRenderList();
+}
+async function padCheck() {
+  const c = PD.cur; if (!c.lines.length) { $('#pdChecks').innerHTML = '<p class="hint">有稿子后自动检查</p>'; PD.check = null; return }
+  PD.check = await jpost('api/pad/check', {id: c.id, lines: c.lines});
+  const k = PD.check, dup = k.lines.filter(x => x.flags.some(f => /重复|相似/.test(f))).length, cl = k.lines.filter(x => x.flags.some(f => f.startsWith('套话'))).length,
+    bn = k.lines.filter(x => x.flags.some(f => f.startsWith('极限词'))).length, todo = (c.lines.join('').match(/【待确认[^】]*】/g) || []).length;
+  const row = (a, b, ok) => `<div class="ck"><span>${a}</span><b class="${ok ? 'ok' : 'warn'}">${b}</b></div>`;
+  $('#pdChecks').innerHTML = row('时长', `约 ${k.secs} 秒 · ${k.chars} 字`, Math.abs(k.secs - (c.len || 60)) <= (c.len || 60) * 0.25) +
+    row('重复 / 和旧稿相似', dup ? dup + ' 句' : '无', !dup) + row('套话', cl ? cl + ' 句' : '无', !cl) + row('极限词', bn ? bn + ' 句' : '无', !bn) +
+    row('口头禅', Object.keys(k.tics).length ? Object.entries(k.tics).map(([w, n]) => w + '×' + n).join(' ') : '正常', !Object.keys(k.tics).length) +
+    row('待确认信息', todo ? todo + ' 处' : '无', !todo);
+  $('#pdMeta').textContent = `${c.lines.length} 句 · 约 ${k.secs} 秒 · 点一句可单独改写`;
+  padRenderEd();
+}
+async function padRewrite(i, t, btn) {
+  const c = PD.cur;
+  if (t === '__del') { c.lines.splice(i, 1); PD.sel = -1; PD.cands = []; padSave(); padRender(); return }
+  const old = btn.textContent; btn.disabled = true; btn.textContent = '…';
+  try { const r = await jpost('api/pad/rewrite', {id: c.id, lines: c.lines, i, tpl: t}); PD.cands = r.cands; padRenderEd() }
+  catch (e) { toast(e.message); btn.disabled = false; btn.textContent = old }
+}
+$('#pdWrite').onclick = async () => {
+  const c = PD.cur; c.topic = $('#pdTopic').value.trim(); if (!c.topic) return toast('先填主题');
+  const b = $('#pdWrite'); b.disabled = true; b.textContent = 'AI 写作中…';
+  try {
+    const r = await jpost('api/pad/write', {id: c.id, topic: c.topic, type: $('#pdType').value, len: c.len || 60, hook: $('#pdHook').value, ending: $('#pdEnd').value, notes: $('#pdNotes').value});
+    if (c.lines.length) { PD.cur = Object.assign(padBlank(), {topic: c.topic, type: c.type, len: c.len}) }
+    PD.cur.lines = r.lines; PD.sel = -1; PD.cands = []; await padSave(); padRender(); toast('写好了' + (r.title ? '，封面标题建议：' + r.title : ''), 4000);
+  } catch (e) { toast(e.message) } finally { b.disabled = false; b.textContent = 'AI 写一版' }
+};
+$('#pdNew').onclick = () => { PD.cur = padBlank(); PD.sel = -1; PD.cands = []; $('#pdNotes').value = ''; padRender(); $('#pdTopic').focus() };
+$('#pdTopic').oninput = () => padSaveSoon();
+$('#pdType').onchange = e => { PD.cur.type = e.target.value; padSaveSoon() };
+$('#pdLen').querySelectorAll('button').forEach(b => b.onclick = () => { PD.cur.len = +b.dataset.v; padRender(); padSaveSoon() });
+$('#pdAdd').onclick = () => { PD.cur.lines.push('新的一句'); PD.sel = PD.cur.lines.length - 1; PD.cands = []; padSave(); padRender() };
+$('#pdPaste').onclick = () => { $('#pdPasteTx').value = ''; $('#pdPasteBox').classList.remove('hidden') };
+$('#pdPasteNo').onclick = () => $('#pdPasteBox').classList.add('hidden');
+$('#pdPasteOk').onclick = () => { const ls = $('#pdPasteTx').value.replace(/\r/g, '').split(/(?<=[。！？!?\n])/).map(x => x.trim()).filter(x => x.length > 1); if (!ls.length) return; PD.cur.lines = ls; PD.sel = -1; $('#pdPasteBox').classList.add('hidden'); padSave(); padRender() };
+$('#pdFix').onclick = async () => {
+  const k = PD.check; if (!k) return; const idx = k.lines.filter(x => x.flags.length).map(x => x.i).slice(0, 6);
+  if (!idx.length) return toast('没有需要改的句子');
+  const b = $('#pdFix'); b.disabled = true;
+  try {
+    for (const [n, i] of idx.entries()) { b.textContent = `改写中 ${n + 1}/${idx.length}…`; const r = await jpost('api/pad/rewrite', {id: PD.cur.id, lines: PD.cur.lines, i, tpl: 'fresh'}); if (r.cands[0]) PD.cur.lines[i] = r.cands[0] }
+    await padSave(); padRender(); toast('已替换 ' + idx.length + ' 句，可以再点单句换别的候选');
+  } catch (e) { toast(e.message) } finally { b.disabled = false; b.textContent = '把标出问题的句子换个说法' }
+};
+$('#pdCopy').onclick = async () => { try { await navigator.clipboard.writeText(PD.cur.lines.join('\n')); toast('已复制') } catch (e) { toast('复制失败，请手动选择复制') } };
+$('#pdTxt').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([PD.cur.lines.join('\n')], {type: 'text/plain;charset=utf-8'})); a.download = (PD.cur.topic || '口播稿') + '.txt'; a.click() };
+const PP = {t: null, y: 0, v: 40, size: 44, mir: false};
+function ppApply() { const el = $('#pdPI'); el.style.transform = `translateY(${-PP.y}px)` + (PP.mir ? ' scaleX(-1)' : ''); el.style.fontSize = PP.size + 'px' }
+function ppToggle() {
+  if (PP.t) { cancelAnimationFrame(PP.t); PP.t = null; $('#pdPPlay').textContent = '继续'; return }
+  $('#pdPPlay').textContent = '暂停'; let last = performance.now();
+  const step = t => { PP.y += (t - last) / 1000 * PP.v; last = t; ppApply(); PP.t = PP.y < $('#pdPI').scrollHeight ? requestAnimationFrame(step) : null };
+  PP.t = requestAnimationFrame(step);
+}
+function ppClose() { if (PP.t) cancelAnimationFrame(PP.t); PP.t = null; $('#pdPPlay').textContent = '开始滚动'; $('#pdP').classList.add('hidden') }
+$('#pdPrompt').onclick = () => { if (!PD.cur.lines.length) return toast('先写好稿子'); $('#pdPI').innerHTML = PD.cur.lines.map(l => `<p style="margin:0 0 .6em">${esc(l)}</p>`).join(''); PP.y = 0; ppApply(); $('#pdP').classList.remove('hidden') };
+$('#pdPPlay').onclick = ppToggle; $('#pdPClose').onclick = ppClose;
+$('#pdPSlow').onclick = () => { PP.v = Math.max(10, PP.v - 10); toast('速度 ' + PP.v, 800) }; $('#pdPFast').onclick = () => { PP.v += 10; toast('速度 ' + PP.v, 800) };
+$('#pdPBig').onclick = () => { PP.size += 6; ppApply() }; $('#pdPSmall').onclick = () => { PP.size = Math.max(24, PP.size - 6); ppApply() };
+$('#pdPMir').onclick = () => { PP.mir = !PP.mir; ppApply() };
+document.addEventListener('keydown', e => { if ($('#pdP').classList.contains('hidden')) return; if (e.code === 'Space') { e.preventDefault(); ppToggle() } if (e.key === 'Escape') ppClose() });
 
 // ---------------- AI 设置
 async function openAI() {
@@ -1018,7 +1267,10 @@ function applyEdition(e) {
   document.querySelectorAll('.brandT').forEach(x => x.textContent = e.brand);
   document.querySelectorAll('.brandI').forEach(x => x.textContent = e.logo || '剪');
   document.querySelectorAll('.brandBy').forEach(x => x.textContent = e.by || '');
-  if (!e.modules) { const m = $('#mods'); if (m) m.style.display = 'none' }
+  if (!e.modules) {
+    if (e.pad) { document.querySelectorAll('#mods [data-m=script],#mods [data-m=ip]').forEach(b => b.remove()); $('#mods [data-m=pad]').classList.remove('hidden') }
+    else { const m = $('#mods'); if (m) m.style.display = 'none' }
+  }
   if (!e.music) {
     document.querySelectorAll('.musicui').forEach(x => x.style.display = 'none');
     $('#optBgm').style.display = 'none'; $('#fxLabel').textContent = '动效';
