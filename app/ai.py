@@ -156,3 +156,34 @@ def proofread(rows, cfg, terms=None, progress=lambda f: None, chunk=120):
                 continue
         progress(min(1.0, (s + chunk) / max(1, len(rows))))
     return out
+
+
+HL_TASK = """下面是一条口播短视频的字幕，每行有编号 id 和文字 t。字幕会把“重点词”标成黄色加粗，请帮我挑重点词。
+
+规则：
+1. 每行最多挑 1 个重点词，必须是该行里【原样连续出现】的 2–8 个字，不能改字、不能跨行。
+2. 优先挑真正有信息量、观众一眼要记住的：具体数字+单位（300位、10月19日、3个方法）、活动/品牌/产品/地名/人名、核心利益或结果（免费诊断、成交翻倍）、强对比或反常识的词。
+3. 不要挑：代词和虚词（我们、大家、这个、一下、一起、然后、其实），泛泛的动词（参加、知道、看看、分享），没有信息量的形容词（非常、很好、重要）。
+4. 不是每行都要标：没有合适重点的行留空，全片大约 40%–60% 的行有重点即可；相邻几行不要重复标同一个词。
+5. 整体看完再挑，挑的是对全片最关键的信息。
+
+只输出 JSON：{"items":[{"id":编号,"k":"重点词"}]}，没有重点的行不用输出。
+
+字幕：
+"""
+
+
+def highlight(rows, cfg, chunk=150):
+    """rows: [{id, t}] → {id: 重点词}"""
+    out = {}
+    for s in range(0, len(rows), chunk):
+        part = rows[s:s + chunk]
+        payload = "\n".join(json.dumps(r, ensure_ascii=False) for r in part)
+        data = _parse(_post(cfg, [{"role": "system", "content": "你是短视频字幕编辑，只输出 JSON。"},
+                                  {"role": "user", "content": HL_TASK + payload}], timeout=90))
+        for it in data.get("items", []):
+            try:
+                out[int(it["id"])] = str(it.get("k", "")).strip()
+            except (KeyError, ValueError, TypeError):
+                continue
+    return out

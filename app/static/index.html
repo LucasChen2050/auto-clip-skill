@@ -351,7 +351,7 @@ h2{font-size:22px;margin:0 0 4px}
           <div><div class="k">剪掉的片段</div><div class="n" id="sDel">0</div></div>
           <div style="margin-left:auto"><button class="btn small ghost" id="reBtn" title="重新识别">重新识别</button></div>
         </div>
-        <div class="ainote" id="aiNote"><span></span><button class="btn small ghost" id="aiRe">重新整理</button></div>
+        <div class="ainote" id="aiNote"><span></span><div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn small ghost" id="hlRe" title="让 AI 通读全片，重新挑每句的重点词（会覆盖现在的高亮）">AI 重标重点</button><button class="btn small ghost" id="aiRe">重新整理</button></div></div>
         <div class="tools">
           <div><div class="label">模板</div><select id="tplSel" class="seg" style="border:0;padding:8px 10px;max-width:170px"></select></div>
           <div><div class="label">账号名（显示在画面角落，可留空）</div><input type="text" id="ipName" maxlength="20" placeholder="@你的账号名" style="width:150px"></div>
@@ -1092,6 +1092,13 @@ function showMod(m) {
 }
 document.querySelectorAll('#mods button').forEach(b => b.onclick = () => showMod(b.dataset.m));
 
+
+$('#hlRe').onclick = async () => {
+  if (!confirm('让 AI 重新挑字幕重点词？会覆盖你现在手动标的高亮。')) return;
+  const b = $('#hlRe'); b.disabled = true; b.textContent = '标注中…';
+  try { clearTimeout(saveT); await saveLines(); const r = await jpost(`api/projects/${S.P.id}/rehighlight`, {}); S.P.lines = r.lines; renderLines(); toast('已重新标注（' + r.how + '）') }
+  catch (e) { toast(e.message) } finally { b.disabled = false; b.textContent = 'AI 重标重点' }
+};
 
 // ---------------- 口播稿
 const PD = {list: [], tpls: [], types: [], cur: null, sel: -1, cands: [], check: null, loaded: false};

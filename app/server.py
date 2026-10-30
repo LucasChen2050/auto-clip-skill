@@ -328,6 +328,19 @@ def step_asr(pid, p):
     return f"识别出 {n} 个字"
 
 
+def _highlight(lines, cfg, cb=None):
+    """字幕重点词：接入 AI 时由 AI 通读全片挑选，失败或没接 AI 时用本地规则。"""
+    if ai.ready(cfg):
+        if cb:
+            cb(0.95, "AI 正在挑字幕重点词…")
+        try:
+            engine.ai_highlight(lines, cfg)
+            return lines
+        except Exception as e:  # noqa: BLE001
+            print("AI 标重点失败，改用本地规则：", e)
+    return engine.auto_highlight(lines)
+
+
 def step_clean(pid, p):
     d = pdir(pid)
     with open(os.path.join(d, "segments.json"), encoding="utf-8") as f:
@@ -340,7 +353,7 @@ def step_clean(pid, p):
                                   lambda f: cb(0.05 + 0.8 * f))
     cb(0.9, "正在处理气口…")
     engine.refine_lines(media.load_audio_16k(os.path.join(d, p["src"])), lines)
-    lines = engine.auto_highlight(lines)
+    lines = _highlight(lines, cfg, cb)
     first = [l for l in lines if not l["deleted"]]
     cover = p.get("cover") or {}
     if not cover.get("manual"):
@@ -1301,6 +1314,34 @@ def line_op(pid: str, req: LineOpReq):
         p["lines"] = lines
         save(p)
     return {"project": summary(p) | {"lines": lines}}
+
+
+@app.post("/api/projects/{pid}/rehighlight")
+def rehighlight(pid: str):
+    """重新标字幕重点词（覆盖现有高亮）。"""
+    p = load(pid)
+    cfg = ai_cfg()
+    lines = p["lines"]
+    for l in lines:
+        l["text"] = engine.plain(l["text"])
+    how = "AI"
+    if ai.ready(cfg):
+        try:
+            engine.ai_highlight(lines, cfg)
+        except Exception as e:  # noqa: BLE001
+            engine.auto_highlight(lines)
+            how = f"本地规则（AI 没成功：{str(e)[:40]}）"
+    else:
+        engine.auto_highlight(lines)
+        how = "本地规则"
+    with lock(pid):
+        q = load(pid)
+        by = {l["id"]: l["text"] for l in lines}
+        for l in q["lines"]:
+            if l["id"] in by:
+                l["text"] = by[l["id"]]
+        save(q)
+    return {"lines": q["lines"], "how": how}
 
 
 class ReplaceReq(BaseModel):

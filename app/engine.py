@@ -238,7 +238,32 @@ HL_POS = ("ns", "nr", "nrt", "nt", "nz", "n", "vn", "m", "eng")
 GROUP_POS = ("ns", "nr", "nrt", "nt", "nz", "n", "m", "q", "eng")
 
 
-def auto_highlight(lines, ratio=0.75):
+HL_STOP = {"一起", "一下", "一些", "一个", "一点", "一直", "一定", "一样", "一般", "大家", "我们", "你们", "他们",
+           "参加", "知道", "时候", "东西", "事情", "方面", "情况", "这样", "那样", "怎么", "什么", "可以", "需要",
+           "非常", "很多", "重要", "问题", "看看", "分享", "今天", "现在", "自己", "这些", "那些", "时间"}
+
+
+def ai_highlight(lines, cfg):
+    """让 AI 挑每行的重点词（只接受原样出现在该行里的词），返回标了几行。失败抛异常，由调用方退回本地规则。"""
+    import ai
+    kept = [l for l in lines if not l.get("deleted")]
+    rows = [{"id": l["id"], "t": plain(l["text"])} for l in kept]
+    res = ai.highlight(rows, cfg)
+    n = 0
+    for l in lines:
+        l["text"] = plain(l["text"])
+        k = res.get(l["id"], "").strip("[]【】 ")
+        if l.get("deleted") or not k or len(k) < 2 or k in HL_STOP or k == l["text"]:
+            continue
+        i = l["text"].find(k)
+        if i < 0:
+            continue
+        l["text"] = l["text"][:i] + "[" + k + "]" + l["text"][i + len(k):]
+        n += 1
+    return n
+
+
+def auto_highlight(lines, ratio=0.5):
     full = "".join(l["text"] for l in lines if not l["deleted"])
     if not full:
         return lines
@@ -259,7 +284,7 @@ def auto_highlight(lines, ratio=0.75):
                 sc *= 0.4  # 避免连续几行高亮同一个词
             if re.search(r"[0-9]", w) or (f == "m" and len(w) >= 2 and re.fullmatch(r"[零一二三四五六七八九十百千万亿两半几%]+", w)):
                 sc = max(sc, 1.2)  # 数字很适合高亮
-            if w in ("一起", "一下", "一些", "一个", "一点", "一直", "一定", "一样", "一般", "大家", "我们", "你们"):
+            if w in HL_STOP:
                 sc = 0
             if len(w) < 2 and f != "m":
                 sc = 0
