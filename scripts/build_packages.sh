@@ -61,8 +61,8 @@ with zipfile.ZipFile(out,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
 }
 
 for t in ${TARGETS:-mac-arm mac-intel win}; do case $t in
-    linux) build x86_64-unknown-linux-gnu 全自动化剪辑Skill-Linux测试 linux ;;
-    mac-arm) build aarch64-apple-darwin 全自动化剪辑Skill-Mac-M芯片 mac arm64 ;;
-    mac-intel) build x86_64-apple-darwin 全自动化剪辑Skill-Mac-Intel mac x86_64 ;;
-    win) build x86_64-pc-windows-msvc 全自动化剪辑Skill-Windows win ;;
+    linux) build x86_64-unknown-linux-gnu auto-clip-skill-linux-test linux ;;
+    mac-arm) build aarch64-apple-darwin auto-clip-skill-mac-apple-silicon mac arm64 ;;
+    mac-intel) build x86_64-apple-darwin auto-clip-skill-mac-intel mac x86_64 ;;
+    win) build x86_64-pc-windows-msvc auto-clip-skill-windows win ;;
   esac; done

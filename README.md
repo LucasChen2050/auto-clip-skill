@@ -14,9 +14,9 @@
 
 | 电脑 | 下载 | 启动 |
 |---|---|---|
-| Mac（M1 / M2 / M3 / M4 芯片） | `全自动化剪辑Skill-Mac-M芯片.zip` | 双击 `启动.command` |
-| Mac（Intel 芯片，2020 年及以前） | `全自动化剪辑Skill-Mac-Intel.zip` | 双击 `启动.command` |
-| Windows 10 / 11（64 位） | `全自动化剪辑Skill-Windows.zip` | 双击 `启动.bat` |
+| Mac（M1 / M2 / M3 / M4 芯片） | `auto-clip-skill-mac-apple-silicon.zip` | 双击 `启动.command` |
+| Mac（Intel 芯片，2020 年及以前） | `auto-clip-skill-mac-intel.zip` | 双击 `启动.command` |
+| Windows 10 / 11（64 位） | `auto-clip-skill-windows.zip` | 双击 `启动.bat` |
 
 > - **Mac 第一次打开**如果提示“无法验证开发者”：右键点 `启动.command` → 打开 → 再点“打开”。只需要一次。
 > - **Windows** 如果弹出“Windows 已保护你的电脑”：点“更多信息” → “仍要运行”。用系统自带的解压就行（右键 → 全部解压缩）。
